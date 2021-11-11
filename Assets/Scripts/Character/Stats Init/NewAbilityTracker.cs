@@ -38,16 +38,20 @@ public class NewAbilityTracker : MonoBehaviour
     [SerializeField] private KeyCode R_Ability_Keycode;
 
     // This is where unique ability input goes
-    // Skillshot
+    // Q - Skillshot
     private Vector3 position;
+    private float Q_Ability_RangeNum;
 
-    // AOE Skillshot
+    // W - AOE Skillshot
     private Vector3 posUp;
     [Header("Other Ability Setup (Case by Case)")]
     [SerializeField] private float AOESkillshot_MaxAbility_Distance;
 
     // This is a situational adjustment to the W indicator clipping through higher terrain / may be obsolete in the future
     RectTransform W_Pic;
+
+    // R - Targeted Ability
+    private float R_AbilityRangeNum;
 
     #endregion
 
@@ -60,6 +64,7 @@ public class NewAbilityTracker : MonoBehaviour
     #region Component Initilization
     HeroClass heroClass;
     private CharacterMovementScript moveScript;
+    HeroCombat heroCombat;
     #endregion
 
     private void Start()
@@ -67,6 +72,7 @@ public class NewAbilityTracker : MonoBehaviour
         // Get our hero class component, getting each ability etc.
         heroClass = GetComponent<HeroClass>();
         moveScript = GetComponent<CharacterMovementScript>();
+        heroCombat = gameObject.GetComponent<HeroCombat>();
 
         // Debug //
         // Set every canvas image to nonvisible at runtime.
@@ -84,10 +90,19 @@ public class NewAbilityTracker : MonoBehaviour
 
         #region Case By Case Hero Init
 
+        // Q Ability - Cube
+        Q_Ability_RangeNum = heroClass.Q_Ability.abilityRangeNum;
+        Q_Ability_Indicator.rectTransform.localScale = new Vector2(Q_Ability_Indicator.rectTransform.localScale.x, Q_Ability_RangeNum * 0.05f);
+
         // W Ability - Cube
+        AOESkillshot_MaxAbility_Distance = heroClass.W_Ability.abilityRangeNum;
+        W_Ability_Range.rectTransform.localScale = new Vector2(AOESkillshot_MaxAbility_Distance * 0.1f, AOESkillshot_MaxAbility_Distance * 0.1f);
         RectTransform AOESkillshot_Container = W_Ability_Indicator.GetComponent<RectTransform>();
         AOESkillshot_Container.anchoredPosition3D = new Vector3(AOESkillshot_Container.anchoredPosition3D.x, AOESkillshot_Container.anchoredPosition3D.y + 10, AOESkillshot_Container.anchoredPosition3D.z);
 
+        // R Ability - Cube
+        R_AbilityRangeNum = heroClass.R_Ability.abilityRangeNum;
+        R_Ability_Range.rectTransform.localScale = new Vector2(R_AbilityRangeNum * 0.1f, R_AbilityRangeNum * 0.1f);
         #endregion
     }
 
@@ -97,6 +112,7 @@ public class NewAbilityTracker : MonoBehaviour
         Q_Ability();
         W_Ability();
         E_Ability();
+        R_Ability();
 
         // Canvas Control for abilities
         RaycastHit hit;
@@ -349,5 +365,77 @@ public class NewAbilityTracker : MonoBehaviour
         }
     }
 
+    void R_Ability()
+    {
+        // Prep or cancel ability indicators
+        if (Input.GetKeyDown(R_Ability_Keycode) && heroClass.R_Ability.isCooldown == false)
+        {
+            if (R_Ability_Indicator.enabled == false)
+            {
+                currentAbility = heroClass.R_Ability;
+                Debug.Log("R ability was prepped.");
+                Q_Ability_Indicator.enabled = false;
+                Q_Ability_Range.enabled = false;
+
+                W_Ability_Indicator.enabled = false;
+                W_Ability_Range.enabled = false;
+
+                E_Ability_Indicator.enabled = false;
+                E_Ability_Range.enabled = false;
+
+                R_Ability_Indicator.enabled = true;
+                R_Ability_Range.enabled = true;
+            }
+            else
+            {
+                currentAbility = null;
+                Debug.Log("R ability was canceled.");
+                R_Ability_Indicator.enabled = false;
+                R_Ability_Range.enabled = false;
+            }
+        }
+        else if (Input.GetKeyDown(R_Ability_Keycode) && heroClass.R_Ability.isCooldown == true)
+        {
+            Debug.Log("R Ability is on Cooldown!");
+        }
+
+        // Use ability?
+        if (R_Ability_Indicator.enabled == true && Input.GetMouseButton(0) && currentAbility.abilityKeyCode == R_Ability_Keycode && GetComponent<HeroCombat>().targetedEnemy != null)
+        {
+            if (Vector3.Distance(gameObject.transform.position, GetComponent<HeroCombat>().targetedEnemy.transform.position) < R_AbilityRangeNum)
+            {
+                Debug.Log("Used R Ability!");
+                heroClass.R_Ability.isCooldown = true;
+                heroClass.R_Ability.HUDIcon.fillAmount = 1;
+
+                ///
+            }
+        }
+
+        // Keep track of CD and Hud Icon
+        if (heroClass.R_Ability.isCooldown)
+        {
+            heroClass.R_Ability.HUDIcon.fillAmount -= 1 / heroClass.R_Ability.abilityCooldown * Time.deltaTime;
+            R_Ability_Indicator.enabled = false;
+            R_Ability_Range.enabled = false;
+
+            if (heroClass.R_Ability.HUDIcon.fillAmount <= 0)
+            {
+                heroClass.R_Ability.HUDIcon.fillAmount = 0;
+                heroClass.R_Ability.isCooldown = false;
+            }
+        }
+    }
+
     #endregion
+    
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        //Gizmos.DrawWireSphere(transform.position, heroClass.R_Ability.abilityRangeNum);
+
+        Gizmos.color = Color.blue;
+        //Gizmos.DrawWireSphere(transform.position, heroClass.Q_Ability.abilityRangeNum);
+    }
+    
 }

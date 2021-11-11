@@ -162,7 +162,7 @@ public class HeroClass : MonoBehaviour
         heroAttackDmg = 5f;
         heroAbilityDmg = 5f;
 
-        heroAttackSpeed = 1;
+        heroAttackSpeed = .85f;
         heroAttackTime = 1.4f;
 
         heroDef = 1f;
@@ -185,7 +185,7 @@ public class HeroClass : MonoBehaviour
         Q_Ability = new AbilityClass();
         Q_Ability.typeOfAbilityCast = AbilityClass.TypeOfAbilityCast.Skillshot;
         Q_Ability.typeOfAbilityCC = AbilityClass.TypeOfAbilityCC.None;
-        Q_Ability.typeOfAbilityDamage = AbilityClass.TypeOfAbilityDamage.AbilityDamage;
+        Q_Ability.typeOfAbilityDamage = AbilityClass.TypeOfAbilityDamage.AttackDamage;
 
         Q_Ability.abilityName = "Cube Shot";
         Q_Ability.abilityCooldown = 7f;
@@ -193,6 +193,8 @@ public class HeroClass : MonoBehaviour
         Q_Ability.Indicator = Q_Indicator;
         Q_Ability.Range = Q_Range;
         Q_Ability.abilityKeyCode = Q_Ability_Hotkey;
+
+        Q_Ability.abilityRangeNum = 6.5f;
 
         Q_Ability.abilityDuration = 0f;
         Q_Ability.abilityBuffPercentage = 0f;
@@ -217,6 +219,8 @@ public class HeroClass : MonoBehaviour
         W_Ability.Range = W_Range;
         W_Ability.abilityKeyCode = W_Ability_Hotkey;
 
+        W_Ability.abilityRangeNum = 4.7f;
+
         W_Ability.abilityDuration = 0f;
         W_Ability.abilityBuffPercentage = 0f;
 
@@ -240,7 +244,34 @@ public class HeroClass : MonoBehaviour
         E_Ability.Range = E_Range;
         E_Ability.abilityKeyCode = E_Ability_Hotkey;
 
+        E_Ability.abilityRangeNum = 1f;
+
         E_Ability.abilityDuration = 1.5f;
         E_Ability.abilityBuffPercentage = .85f;
+
+        ///
+        /// R Abililty Init
+        ///
+
+        /// Ability Summary:
+        /// Cast a targeted missile at an enemy.
+        /// 
+
+        R_Ability = new AbilityClass();
+        R_Ability.typeOfAbilityCast = AbilityClass.TypeOfAbilityCast.Targeted;
+        R_Ability.typeOfAbilityCC = AbilityClass.TypeOfAbilityCC.Slow;
+        R_Ability.typeOfAbilityDamage = AbilityClass.TypeOfAbilityDamage.AbilityDamage;
+
+        R_Ability.abilityName = "Cube Missile";
+        R_Ability.abilityCooldown = 60f;
+        R_Ability.HUDIcon = R_HudIcon;
+        R_Ability.Indicator = R_Indicator;
+        R_Ability.Range = R_Range;
+        R_Ability.abilityKeyCode = R_Ability_Hotkey;
+
+        R_Ability.abilityRangeNum = 9f;
+
+        R_Ability.abilityDuration = 0f;
+        R_Ability.abilityBuffPercentage = 0f;
     }
 }

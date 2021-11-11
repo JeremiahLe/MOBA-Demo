@@ -10,8 +10,8 @@ public class CharacterMovementScript : MonoBehaviour
 
     [SerializeField] private KeyCode stopKeycode;
 
-    //public float rotateSpeedMovement = 0.075f;
-    //float rotateVelocity;
+    public float rotateSpeedMovement = 0.075f;
+    public float rotateVelocity;
 
     // Start is called before the first frame update
     void Start()
@@ -92,5 +92,10 @@ public class CharacterMovementScript : MonoBehaviour
 
             StartCoroutine(ResetStopMovement());
         }
+    }
+
+    public void JustStopMovement()
+    {
+        StartCoroutine(ResetStopMovement());
     }
 }

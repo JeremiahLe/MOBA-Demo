@@ -91,7 +91,7 @@ public class Enemy_Combat_Script : MonoBehaviour
 
         foreach (Collider col in hitCollider)
         {
-            if (col.gameObject.GetComponent<TargetableScript>() != null && transforms.Contains(col.transform) == false && col.gameObject != this.gameObject)
+            if (col.gameObject.GetComponent<TargetableScript>() != null && transforms.Contains(col.transform) == false && col.gameObject != this.gameObject && col.gameObject.tag != "Enemy")
                 transforms.Add(col.transform);
         }
 
@@ -161,6 +161,11 @@ public class Enemy_Combat_Script : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, enemyAttackRange);
     }
     */
+
+    private void OnDestroy()
+    {
+        transforms.Clear();
+    }
 
     /* Used for debugging range indicator in game
     void CheckAttackRange()

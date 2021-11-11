@@ -25,6 +25,8 @@ public class AbilityClass
 
     public float abilityBuffPercentage;
 
+    public float abilityRangeNum;
+
     public bool isCooldown;
 
     public Sprite Indicator;

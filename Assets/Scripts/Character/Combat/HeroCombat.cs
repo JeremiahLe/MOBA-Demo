@@ -13,6 +13,9 @@ public class HeroCombat : MonoBehaviour
     public GameObject targetedEnemy;
     [SerializeField] private float heroAttackRange;
     [SerializeField] private float heroRotateSpeedForAttack;
+    public bool moveToEnemy = false;
+
+    public GameObject prevEnemyRef;
 
     // Combat range visuals
     [SerializeField] private Image attackRange_Indicator;
@@ -59,17 +62,24 @@ public class HeroCombat : MonoBehaviour
     {
         if (targetedEnemy != null)
         {
-            if (Vector3.Distance(gameObject.transform.position, targetedEnemy.transform.position) > heroAttackRange)
+            if (Vector3.Distance(gameObject.transform.position, targetedEnemy.transform.position) > heroAttackRange) // if otuside range, move inside range
             {
-                moveScript.agent.SetDestination(targetedEnemy.transform.position);
-                moveScript.agent.stoppingDistance = heroAttackRange;
+                if (moveToEnemy == true)
+                {
+                    moveScript.agent.SetDestination(targetedEnemy.transform.position);
+                    moveScript.agent.stoppingDistance = heroAttackRange;
+                }
+
             }
-            else
+            else if (Vector3.Distance(gameObject.transform.position, targetedEnemy.transform.position) < heroAttackRange && moveToEnemy == true) // once inside range, and can move
             {
                 if (heroAttackType == HeroAttackType.Melee)
                 {
+                    FaceTarget();
+
                     if (performMeleeAttack)
                     {
+
                         Debug.Log("Attack the minion");
 
                         // Start Courotine
@@ -78,11 +88,17 @@ public class HeroCombat : MonoBehaviour
                 }
             }
         }
+        else if (targetedEnemy == null)
+        {
+            anim.SetBool("Basic Attack", false); // fix ghost autos?
+            performMeleeAttack = true;
+        }
     }
 
     IEnumerator MeleeAttackInterval()
     {
         performMeleeAttack = false;
+        anim.SetFloat("AttackAnimSpeed", heroClassScript.heroAttackSpeed);
         anim.SetBool("Basic Attack", true);
 
         yield return new WaitForSeconds(heroClassScript.heroAttackTime / ((100 + heroClassScript.heroAttackTime) * 0.01f));
@@ -98,10 +114,10 @@ public class HeroCombat : MonoBehaviour
     {
         if (targetedEnemy != null)
         {
-            if (targetedEnemy.GetComponent<TargetableScript>().enemyType == TargetableScript.EnemyType.Minion)
-            {
-                targetedEnemy.GetComponent<EnemyStatsScript>().enemyHealth -= heroClassScript.heroAttackDmg;
-            }
+            //if (targetedEnemy.GetComponent<TargetableScript>().enemyType == TargetableScript.EnemyType.Minion)
+            //if (targetedEnemy == prevEnemyRef)
+            //if (moveToEnemy)
+            targetedEnemy.GetComponent<EnemyStatsScript>().enemyHealth -= heroClassScript.heroAttackDmg;
         }
 
         performMeleeAttack = true;
@@ -124,4 +140,23 @@ public class HeroCombat : MonoBehaviour
             performMeleeAttack = false;
         }
     }
+
+    void FaceTarget()
+    {
+        // Rotation ??
+        Quaternion rotationToLookAt = Quaternion.LookRotation(targetedEnemy.transform.position - transform.position);
+        float rotationY = Mathf.SmoothDampAngle(transform.eulerAngles.y,
+            rotationToLookAt.eulerAngles.y,
+            ref moveScript.rotateVelocity,
+            heroRotateSpeedForAttack * (Time.deltaTime * 5));
+
+        transform.eulerAngles = new Vector3(0, rotationY, 0);
+    }
+
+    public void ResetAutoAttack()
+    {
+        anim.SetBool("Basic Attack", false);
+        performMeleeAttack = true;
+    }
+
 }
