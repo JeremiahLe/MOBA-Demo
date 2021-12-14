@@ -7,15 +7,16 @@ TagManager:
   - Enemy
   - Floor
   - MyPlayer
+  - HUDWindowTag
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Obstacle
   - Water
   - UI
   - Terrain
-  - 
+  - Projectile
   - 
   - 
   - 

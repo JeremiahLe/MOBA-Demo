@@ -13,6 +13,11 @@ public class CharacterMovementScript : MonoBehaviour
     public float rotateSpeedMovement = 0.075f;
     public float rotateVelocity;
 
+    public bool abilityCasting = false;
+
+    float prevX;
+    float prevZ;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -71,31 +76,41 @@ public class CharacterMovementScript : MonoBehaviour
     private void LateUpdate()
     {
         if (agent.velocity.sqrMagnitude > Mathf.Epsilon)
-            transform.rotation = Quaternion.LookRotation(agent.velocity.normalized);
+        {
+            transform.localRotation = Quaternion.LookRotation(new Vector3(agent.velocity.normalized.x, 90, agent.velocity.normalized.z));
+            prevX = agent.velocity.normalized.x;
+            prevZ = agent.velocity.normalized.z;
+        }
+        else if (abilityCasting != true)
+           transform.localRotation = Quaternion.LookRotation(new Vector3(prevX, 90, prevZ));
+        else if (abilityCasting == true)
+        {
+            //transform.localRotation = Quaternion.LookRotation(Vector3.forward, Vector3.up);
+        }
     }
 
     IEnumerator ResetStopMovement()
     {
         yield return new WaitForSeconds(0.3f);
         agent.isStopped = false;
+        abilityCasting = false;
     }
 
     void CheckStopMovement()
     {
         if (Input.GetKeyDown(stopKeycode))
         {
-            agent.updateRotation = false;
-            heroCombatScript.targetedEnemy = null;
-
-            agent.isStopped = true;
-            agent.SetDestination(transform.position);
-
-            StartCoroutine(ResetStopMovement());
+            JustStopMovement(false);
         }
     }
 
-    public void JustStopMovement()
+    public void JustStopMovement(bool _abilityCasting)
     {
+        heroCombatScript.targetedEnemy = null;
+        agent.isStopped = true;
+        agent.SetDestination(transform.position);
+        abilityCasting = _abilityCasting;
+
         StartCoroutine(ResetStopMovement());
     }
 }

@@ -22,13 +22,23 @@ public class HealthSlider2D_Script : MonoBehaviour
         playerSlider3D.maxValue = heroClassScript.heroMaxHealth;
         playerSlider2D.maxValue = heroClassScript.heroMaxHealth;
 
-        heroClassScript.heroHealth = heroClassScript.heroMaxHealth; // wtf is this?
+        //heroClassScript.heroHealth = heroClassScript.heroMaxHealth; // wtf is this?
     }
 
     // Update is called once per frame
     void Update()
     {
+        playerSlider3D.maxValue = heroClassScript.heroMaxHealth;
+        playerSlider2D.maxValue = heroClassScript.heroMaxHealth;
+
         playerSlider2D.value = heroClassScript.heroHealth;
         playerSlider3D.value = playerSlider2D.value;
+    }
+
+    public void CallHealthTrigger(GameObject targetedEnemyRef)
+    {
+        //Debug.Log("Called health HUD trigger!");
+        //playerSlider2D.value = targetedEnemyRef.GetComponent<HeroClass>().heroHealth;
+        // playerSlider3D.value = playerSlider2D.value;
     }
 }

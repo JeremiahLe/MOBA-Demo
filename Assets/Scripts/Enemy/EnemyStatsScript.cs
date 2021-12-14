@@ -19,6 +19,9 @@ public class EnemyStatsScript : MonoBehaviour
     [SerializeField] public float enemyAttackDmg;
     [SerializeField] public float enemyAbilityDmg;
 
+    [SerializeField] public float enemyAttackSpeed;
+    [SerializeField] public float enemyAttackTime;
+
     [SerializeField] public float enemyDef;
     [SerializeField] public float enemyRes;
 
@@ -33,14 +36,6 @@ public class EnemyStatsScript : MonoBehaviour
         // Stat Init
         enemyMaxHealth = enemyHealth;
         agent.speed = enemySpeed;
-    }
-
-    private void Update()
-    {
-        if (enemyHealth <= 0)
-        {
-            Destroy(gameObject);
-        }
     }
 
 }

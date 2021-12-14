@@ -38,14 +38,22 @@ public class Enemy_Combat_Script : MonoBehaviour
     public bool performMeleeAttack = true;
     public bool enemyWithinAttackRange = false;
 
+    // Not sure why this is needed
+    [SerializeField] Slider PlayerHealthHUD;
+    HealthSlider2D_Script healthCallRef;
+
     void Start()
     {
         attackRange_Indicator_Image = attackRange_Indicator.GetComponent<Image>();
         agent = gameObject.GetComponent<NavMeshAgent>();
-        //enemyMoveScript = GetComponent<Enemy_Move_Script>();
+        enemyStatsScript = gameObject.GetComponent<EnemyStatsScript>();
+        anim = gameObject.GetComponent<Animator>();
+        enemyMoveScript = GetComponent<Enemy_Move_Script>();
 
         // This is defunct code to scale the image of the attack range properly
         //radius = enemyAttackRange / 2.0f / 2.0f / 2.0f / 1.25f;
+
+        healthCallRef = PlayerHealthHUD.GetComponent<HealthSlider2D_Script>();
     }
 
     void Update()
@@ -54,31 +62,129 @@ public class Enemy_Combat_Script : MonoBehaviour
         //attackRange_Indicator.transform.localScale = new Vector3(radius + offset, radius + offset, radius + offset);
 
         // Only check for targets when none
-        if (targetedEnemy == null)
+        if (targetedEnemy == null && isEnemyAlive)
             CheckAggroRadius();
 
-        MoveToEnemy();
+        if (isEnemyAlive)
+        {
+            MoveToEnemy();
+            CheckEnemyLeaveRadius();
+        }
 
-        CheckEnemyLeaveRadius();
+        CheckDead();
     }
+
+    void CheckCombat()
+    {
+        if (targetedEnemy != null)
+        {
+            if (enemyAttackType == EnemyAttackType.Melee)
+            {
+                FaceTarget();
+
+                if (performMeleeAttack && enemyWithinAttackRange)
+                {
+
+                    //Debug.Log("Attack the player");
+
+                    // Start Courotine
+                    //if (targetedEnemy.GetComponent<Enemy_Combat_Script>().isEnemyAlive)
+                    StartCoroutine(MeleeAttackInterval());
+                }
+            }
+        }
+        else if (targetedEnemy == null)
+        {
+            anim.SetBool("Basic Attack", false); // fix ghost autos?
+            performMeleeAttack = true;
+        }
+    }
+
+    IEnumerator MeleeAttackInterval()
+    {
+        performMeleeAttack = false;
+        anim.SetFloat("AttackAnimSpeed", enemyStatsScript.enemyAttackSpeed);
+        anim.SetBool("Basic Attack", true);
+
+        yield return new WaitForSeconds(enemyStatsScript.enemyAttackTime / ((100 + enemyStatsScript.enemyAttackTime) * 0.01f));
+
+        if (targetedEnemy == null)
+        {
+            anim.SetBool("Basic Attack", false);
+            performMeleeAttack = true;
+        }
+    }
+
+    public void MeleeAttack()
+    {
+        if (targetedEnemy != null)
+        {
+            //if (targetedEnemy.GetComponent<TargetableScript>().enemyType == TargetableScript.EnemyType.Minion)
+            //if (targetedEnemy == prevEnemyRef)
+            //if (moveToEnemy)
+            float damageCalc = enemyStatsScript.enemyAttackDmg - (targetedEnemy.GetComponent<HeroClass>().heroDef * 0.1f);
+            //damageCalc = Mathf.Round(damageCalc * 100f) / 100f;
+            damageCalc = Mathf.Round(damageCalc);
+            if (damageCalc <= 1f)
+            {
+                targetedEnemy.GetComponent<HeroClass>().heroHealth -= 1f;
+                healthCallRef.CallHealthTrigger(targetedEnemy);
+            }
+            else
+            {
+                targetedEnemy.GetComponent<HeroClass>().heroHealth -= damageCalc;
+                healthCallRef.CallHealthTrigger(targetedEnemy);
+            }
+        }
+
+        performMeleeAttack = true;
+    }
+
+    void CheckDead()
+    {
+        if (enemyStatsScript.enemyHealth <= 0 && isEnemyAlive == true)
+        {
+            StartCoroutine(CallDeadAnim());
+            isEnemyAlive = false;
+            if (enemyMoveScript != null)
+                enemyMoveScript.isEnemyAliveRef = false;
+        }
+    }
+
+    IEnumerator CallDeadAnim()
+    {
+        //anim.SetBool("isDead", true);
+        yield return new WaitForSeconds(0.01f);
+        anim.SetBool("isDead", true);
+    }
+
+    public void OnDeadAnimEnd()
+    {
+        Destroy(gameObject);
+    } 
 
     // If the targeted enemy leaves aggro radius, reset
     void CheckEnemyLeaveRadius()
     {
         if (targetedEnemy != null)
         {
-            if (Vector3.Distance (targetedEnemy.transform.position, transform.position) > enemyAggroRange)
+            if (Vector3.Distance(gameObject.transform.position, targetedEnemy.transform.position) > enemyAggroRange)
             {
                 targetedEnemy = null;
-                enemyWithinAttackRange = false;
                 transforms.Clear();
+                enemyWithinAttackRange = false;
+                //Debug.Log("Outside of aggro range");
             }
             else
-            if (Vector3.Distance(targetedEnemy.transform.position, transform.position) > enemyAttackRange)
+            if (Vector3.Distance(gameObject.transform.position, targetedEnemy.transform.position) > enemyAttackRange)
             {
                 enemyWithinAttackRange = false;
+                ResetAutoAttack();
+                //Debug.Log("Outside of attack range");
             }
         }
+        else
+            ResetAutoAttack();
     }
 
     public Transform[] targets;
@@ -124,7 +230,11 @@ public class Enemy_Combat_Script : MonoBehaviour
         }
 
         if (transforms.Count != 0)
+        {
             targetedEnemy = closestTarget.gameObject;
+            if (enemyMoveScript != null)
+                enemyMoveScript.GetNewTargetedEnemyRef(targetedEnemy);
+        }
     }
 
     // Move the NavMesh Agent after TargetedEnemy has been selected
@@ -135,9 +245,9 @@ public class Enemy_Combat_Script : MonoBehaviour
             if (Vector3.Distance(gameObject.transform.position, targetedEnemy.transform.position) < enemyAggroRange)
             {
                 agent.SetDestination(targetedEnemy.transform.position);
-                agent.stoppingDistance = enemyAttackRange;
+                agent.stoppingDistance = enemyAttackRange - 0.55f;
 
-                if (Vector3.Distance(gameObject.transform.position, targetedEnemy.transform.position) > enemyAttackRange && targetedEnemy != null && enemyWithinAttackRange == false)
+                if (Vector3.Distance(gameObject.transform.position, targetedEnemy.transform.position) < enemyAttackRange && targetedEnemy != null && enemyWithinAttackRange == false)
                 {
                     //agent.SetDestination(targetedEnemy.transform.position);
                     //agent.stoppingDistance = enemyAttackRange;
@@ -145,13 +255,34 @@ public class Enemy_Combat_Script : MonoBehaviour
                 }
                 else if (enemyWithinAttackRange == true)
                 {
-                    agent.isStopped = true;
+                    //Debug.Log("Enemy entered Attack Range");
+                    CheckCombat();
+                    //agent.isStopped = true;
                 }
             }
         }
     }
 
-    /* Used for drawing radius in Scene View
+    // Face Target
+    void FaceTarget()
+    {
+        // Rotation ??
+        Quaternion rotationToLookAt = Quaternion.LookRotation(targetedEnemy.transform.position - transform.position);
+        float rotationQ = Mathf.SmoothDampAngle(transform.eulerAngles.y, rotationToLookAt.eulerAngles.y,
+            ref enemyMoveScript.rotateVelocity,
+            enemyRotateSpeedForAttack * (Time.deltaTime * 5));
+
+        transform.eulerAngles = new Vector3(0, rotationQ, 0);
+    }
+
+    public void ResetAutoAttack()
+    {
+        anim.SetBool("Basic Attack", false);
+        performMeleeAttack = true;
+    }
+
+    // Used for drawing radius in Scene View
+    /*
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;

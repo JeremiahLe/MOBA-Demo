@@ -23,6 +23,8 @@ public class HUD_Text_Controller : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //heroClassScript.heroHealth = Mathf.Round(heroClassScript.heroHealth * 100f) / 100f;
+
         if (this.typeOfStat == TypeOfStat.health)
             statText.text = (heroClassScript.heroHealth + "/" + heroClassScript.heroMaxHealth);
         else

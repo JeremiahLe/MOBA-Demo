@@ -80,10 +80,11 @@ public class HeroCombat : MonoBehaviour
                     if (performMeleeAttack)
                     {
 
-                        Debug.Log("Attack the minion");
+                        //Debug.Log("Attack the minion");
 
                         // Start Courotine
-                        StartCoroutine(MeleeAttackInterval());
+                        //if (targetedEnemy.GetComponent<Enemy_Combat_Script>().isEnemyAlive)
+                            StartCoroutine(MeleeAttackInterval());
                     }
                 }
             }
@@ -97,6 +98,7 @@ public class HeroCombat : MonoBehaviour
 
     IEnumerator MeleeAttackInterval()
     {
+
         performMeleeAttack = false;
         anim.SetFloat("AttackAnimSpeed", heroClassScript.heroAttackSpeed);
         anim.SetBool("Basic Attack", true);
@@ -117,7 +119,19 @@ public class HeroCombat : MonoBehaviour
             //if (targetedEnemy.GetComponent<TargetableScript>().enemyType == TargetableScript.EnemyType.Minion)
             //if (targetedEnemy == prevEnemyRef)
             //if (moveToEnemy)
-            targetedEnemy.GetComponent<EnemyStatsScript>().enemyHealth -= heroClassScript.heroAttackDmg;
+
+            float damageCalc = heroClassScript.heroAttackDmg - (targetedEnemy.GetComponent<EnemyStatsScript>().enemyDef * 0.1f);
+            damageCalc = Mathf.Round(damageCalc);
+
+            if (damageCalc <= 1f)
+            {
+                targetedEnemy.GetComponent<EnemyStatsScript>().enemyHealth -= 1f;
+            }
+            else
+            {
+                targetedEnemy.GetComponent<EnemyStatsScript>().enemyHealth -= damageCalc;
+            }
+
         }
 
         performMeleeAttack = true;
@@ -159,4 +173,9 @@ public class HeroCombat : MonoBehaviour
         performMeleeAttack = true;
     }
 
+    //private void OnDrawGizmosSelected()
+    //{
+    //    Gizmos.color = Color.red;
+    //    Gizmos.DrawWireSphere(transform.position, heroAttackRange);
+    //}
 }

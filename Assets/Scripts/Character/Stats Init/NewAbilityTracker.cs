@@ -39,13 +39,23 @@ public class NewAbilityTracker : MonoBehaviour
 
     // This is where unique ability input goes
     // Q - Skillshot
+    [Header("Other Ability Setup (Case by Case)")]
+    private GameObject projectilePrefab;
+    [DisplayWithoutEdit] public string Seperator;
+
+    [Header("Q Manual")]
+    public GameObject Q_Projectile;
     private Vector3 position;
     private float Q_Ability_RangeNum;
+    public Transform Q_Ability_Spawn;
+    public Transform Q_Ability_TargetTransform;
 
     // W - AOE Skillshot
     private Vector3 posUp;
-    [Header("Other Ability Setup (Case by Case)")]
+    [Header("W Manual")]
     [SerializeField] private float AOESkillshot_MaxAbility_Distance;
+    public GameObject W_Projectile;
+    public Transform W_Ability_Spawn;
 
     // This is a situational adjustment to the W indicator clipping through higher terrain / may be obsolete in the future
     RectTransform W_Pic;
@@ -137,7 +147,7 @@ public class NewAbilityTracker : MonoBehaviour
         {
             if (currentAbility.abilityKeyCode == W_Ability_Keycode)
             {
-                if (Physics.Raycast(ray, out hit, Mathf.Infinity))
+                if (Physics.Raycast(ray, out hit, Mathf.Infinity, terrainMask))
                 {
                     if (hit.collider.gameObject != this.gameObject)
                     {
@@ -177,6 +187,26 @@ public class NewAbilityTracker : MonoBehaviour
             Debug.Log("Coroutine Executed!");
         }
     }
+
+    void CreateAbility(AbilityClass _ability, GameObject _prefab,
+        Vector3 _abilitySpawn, GameObject targetPos, Vector3 _abilityTargetDir, bool _targeted)
+    {
+        Debug.Log(_ability.abilityName + " created!");
+        GameObject _temp = Instantiate(_prefab, _abilitySpawn, Quaternion.Euler(-90, 0, 0));
+
+        //Rigidbody rb = _temp.GetComponent<Rigidbody>();
+        //rb.AddRelativeForce(transform.forward * _ability.abilitySpeed, ForceMode.Impulse);
+        _temp.GetComponent<ProjectileScript>().target = targetPos;
+        _temp.GetComponent<ProjectileScript>().targetLoc = _abilityTargetDir;
+        _temp.GetComponent<ProjectileScript>().projSpeed = _ability.abilitySpeed;
+        _temp.GetComponent<ProjectileScript>().projDamage = _ability.abilityBaseDamage + heroClass.heroAbilityDmg;
+        _temp.GetComponent<ProjectileScript>().projAbilityTypeString = _ability.typeOfAbilityCast.ToString();
+        _temp.GetComponent<ProjectileScript>().projDamageType = ProjectileScript.ProjDamageType.Ability;
+        _temp.GetComponent<ProjectileScript>().projCreator = gameObject;
+        _temp.GetComponent<ProjectileScript>().projRange = _ability.abilityRangeNum / 9.2f; // FIXME // WHEN PROJ OUT OF RANGE, DESTROY
+        _temp.GetComponent<ProjectileScript>().projTargeted = _targeted;
+    }
+
 
     #region Case by Case Ability Function Calls
 
@@ -219,8 +249,20 @@ public class NewAbilityTracker : MonoBehaviour
         }
 
         // Use ability?
-        if (Q_Ability_Indicator.enabled == true && Input.GetMouseButton(0) && currentAbility.abilityKeyCode == Q_Ability_Keycode)
+        if (Q_Ability_Indicator.enabled == true && Input.GetMouseButtonDown(0) && currentAbility.abilityKeyCode == Q_Ability_Keycode)
         {
+            // FIXME // before instantiation, create a Cast Time buffer and UI element
+            moveScript.JustStopMovement(true);
+            Debug.Log(Q_Ability_Canvas.transform.rotation.y);
+            Vector3 relativePos = Q_Ability_TargetTransform.position - transform.position;
+
+            // the second argument, upwards, defaults to Vector3.up
+            Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
+            transform.rotation = rotation;
+
+            //transform.LookAt(Q_Ability_TargetTransform.position + transform.forward);
+            CreateAbility(heroClass.Q_Ability, Q_Projectile, Q_Ability_Spawn.transform.position, null, relativePos, false);
+
             Debug.Log("Used Q Ability!");
             heroClass.Q_Ability.isCooldown = true;
             heroClass.Q_Ability.HUDIcon.fillAmount = 1;
@@ -278,6 +320,10 @@ public class NewAbilityTracker : MonoBehaviour
         // Use ability?
         if (W_Ability_Indicator.enabled == true && Input.GetMouseButton(0) && currentAbility.abilityKeyCode == W_Ability_Keycode)
         {
+            // FIXME // before instantiation, create a Cast Time buffer and UI element
+
+            CreateAbility(heroClass.W_Ability, W_Projectile, W_Ability_Spawn.transform.position, null, Vector3.zero, false);
+
             Debug.Log("Used W Ability!");
             heroClass.W_Ability.isCooldown = true;
             heroClass.W_Ability.HUDIcon.fillAmount = 1;
@@ -429,13 +475,13 @@ public class NewAbilityTracker : MonoBehaviour
 
     #endregion
     
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
+    //private void OnDrawGizmosSelected()
+    //{
+        //Gizmos.color = Color.red;
         //Gizmos.DrawWireSphere(transform.position, heroClass.R_Ability.abilityRangeNum);
 
-        Gizmos.color = Color.blue;
+        //Gizmos.color = Color.blue;
         //Gizmos.DrawWireSphere(transform.position, heroClass.Q_Ability.abilityRangeNum);
-    }
+    //}
     
 }

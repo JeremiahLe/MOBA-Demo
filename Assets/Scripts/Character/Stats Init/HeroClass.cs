@@ -12,6 +12,7 @@ public class HeroClass : MonoBehaviour
     public enum HeroAssigner { Cube, Jawn }
     public HeroAssigner heroAssigner;
     [DisplayWithoutEdit] public string HeroName;
+    [DisplayWithoutEdit] public Sprite heroHUDSprite;
 
     [Header("Hero Stats")]
     [DisplayWithoutEdit] public int heroLevel;
@@ -145,6 +146,25 @@ public class HeroClass : MonoBehaviour
         }
     }
 
+    void Load_HeroHUDSprite(HeroAssigner _assignedHero)
+    {
+        heroAssigner = _assignedHero;
+
+        switch (heroAssigner)
+        {
+            case (HeroAssigner.Cube):
+                heroHUDSprite = Resources.Load<Sprite>("HeroHUDIcons/Mina_HUD_Sprite");
+                Debug.Log("Loaded " + heroAssigner.ToString() + " sprite");
+                break;
+
+            default:
+                Debug.Log("No Hero found?!");
+                break;
+        }
+    }
+
+    // Hero inits 
+
     void Hero_Cube_Ability_Init()
     {
         ///
@@ -152,6 +172,7 @@ public class HeroClass : MonoBehaviour
         /// 
 
         heroLevel = 1;
+        Load_HeroHUDSprite(HeroAssigner.Cube);
 
         heroHealth = 450f;
         heroMaxHealth = heroHealth;
@@ -159,8 +180,8 @@ public class HeroClass : MonoBehaviour
         heroMana = 100f;
         heroMaxMana = heroMana;
 
-        heroAttackDmg = 5f;
-        heroAbilityDmg = 5f;
+        heroAttackDmg = 25f;
+        heroAbilityDmg = 0f;
 
         heroAttackSpeed = .85f;
         heroAttackTime = 1.4f;
@@ -188,7 +209,7 @@ public class HeroClass : MonoBehaviour
         Q_Ability.typeOfAbilityDamage = AbilityClass.TypeOfAbilityDamage.AttackDamage;
 
         Q_Ability.abilityName = "Cube Shot";
-        Q_Ability.abilityCooldown = 7f;
+        Q_Ability.abilityCooldown = 2f;
         Q_Ability.HUDIcon = Q_HudIcon;
         Q_Ability.Indicator = Q_Indicator;
         Q_Ability.Range = Q_Range;
@@ -198,6 +219,14 @@ public class HeroClass : MonoBehaviour
 
         Q_Ability.abilityDuration = 0f;
         Q_Ability.abilityBuffPercentage = 0f;
+
+        Q_Ability.abilitySpeed = 600f; // average speed
+        Q_Ability.abilityCastTime = 0f;
+
+        Q_Ability.abilityBaseDamage = 60f;
+
+        // may change this
+        //Q_Ability.abilitySprite = Resources.Load<Sprite>("ProjectilePrefabSprites/Fireball_Sprite");
 
         ///
         /// W Abililty Init
@@ -213,7 +242,7 @@ public class HeroClass : MonoBehaviour
         W_Ability.typeOfAbilityDamage = AbilityClass.TypeOfAbilityDamage.AbilityDamage;
 
         W_Ability.abilityName = "Cube Bomb";
-        W_Ability.abilityCooldown = 11f;
+        W_Ability.abilityCooldown = 2f;
         W_Ability.HUDIcon = W_HudIcon;
         W_Ability.Indicator = W_Indicator;
         W_Ability.Range = W_Range;
@@ -223,6 +252,11 @@ public class HeroClass : MonoBehaviour
 
         W_Ability.abilityDuration = 0f;
         W_Ability.abilityBuffPercentage = 0f;
+
+        W_Ability.abilitySpeed = 0f; // it doesn't move
+        W_Ability.abilityCastTime = 0f;
+
+        W_Ability.abilityBaseDamage = 110f;
 
         ///
         /// E Abililty Init

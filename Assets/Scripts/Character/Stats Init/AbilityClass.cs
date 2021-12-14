@@ -26,11 +26,16 @@ public class AbilityClass
     public float abilityBuffPercentage;
 
     public float abilityRangeNum;
+    public float abilitySpeed;
+    public float abilityCastTime;
+
+    public float abilityBaseDamage;
 
     public bool isCooldown;
 
     public Sprite Indicator;
     public Sprite Range;
+    //public Sprite abilitySprite;
     public Image HUDIcon;
 
     public KeyCode abilityKeyCode;
