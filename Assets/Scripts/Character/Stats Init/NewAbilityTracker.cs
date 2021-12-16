@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class NewAbilityTracker : MonoBehaviour
 {
     /// <summary>
@@ -69,6 +70,7 @@ public class NewAbilityTracker : MonoBehaviour
     [Header("Other Components")]
     [SerializeField] private Transform playerTransform;
     [SerializeField] private LayerMask terrainMask;
+    [SerializeField] private SystemNotificationManager_Script systemScript;
     #endregion
 
     #region Component Initilization
@@ -83,6 +85,7 @@ public class NewAbilityTracker : MonoBehaviour
         heroClass = GetComponent<HeroClass>();
         moveScript = GetComponent<CharacterMovementScript>();
         heroCombat = gameObject.GetComponent<HeroCombat>();
+        systemScript = FindObjectOfType<SystemNotificationManager_Script>();
 
         // Debug //
         // Set every canvas image to nonvisible at runtime.
@@ -203,7 +206,7 @@ public class NewAbilityTracker : MonoBehaviour
         _temp.GetComponent<ProjectileScript>().projAbilityTypeString = _ability.typeOfAbilityCast.ToString();
         _temp.GetComponent<ProjectileScript>().projDamageType = ProjectileScript.ProjDamageType.Ability;
         _temp.GetComponent<ProjectileScript>().projCreator = gameObject;
-        _temp.GetComponent<ProjectileScript>().projRange = _ability.abilityRangeNum / 9.2f; // FIXME // WHEN PROJ OUT OF RANGE, DESTROY
+        _temp.GetComponent<ProjectileScript>().projRange = _ability.abilityRangeNum / 14f; // FIXME // WHEN PROJ OUT OF RANGE, DESTROY
         _temp.GetComponent<ProjectileScript>().projTargeted = _targeted;
     }
 
@@ -251,21 +254,36 @@ public class NewAbilityTracker : MonoBehaviour
         // Use ability?
         if (Q_Ability_Indicator.enabled == true && Input.GetMouseButtonDown(0) && currentAbility.abilityKeyCode == Q_Ability_Keycode)
         {
-            // FIXME // before instantiation, create a Cast Time buffer and UI element
-            moveScript.JustStopMovement(true);
-            Debug.Log(Q_Ability_Canvas.transform.rotation.y);
-            Vector3 relativePos = Q_Ability_TargetTransform.position - transform.position;
+            // Check Mana, then Cast Ability
+            if (heroClass.heroMana >= heroClass.Q_Ability.abilityCost)
+            {
+                // FIXME // before instantiation, create a Cast Time buffer and UI element
+                moveScript.JustStopMovement(true);
+                Vector3 relativePos = Q_Ability_TargetTransform.position - transform.position;
 
-            // the second argument, upwards, defaults to Vector3.up
-            Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
-            transform.rotation = rotation;
+                // the second argument, upwards, defaults to Vector3.up
+                Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
+                transform.rotation = rotation;
 
-            //transform.LookAt(Q_Ability_TargetTransform.position + transform.forward);
-            CreateAbility(heroClass.Q_Ability, Q_Projectile, Q_Ability_Spawn.transform.position, null, relativePos, false);
+                //transform.LookAt(Q_Ability_TargetTransform.position + transform.forward);
+                CreateAbility(heroClass.Q_Ability, Q_Projectile, Q_Ability_Spawn.transform.position, null, relativePos, false);
+                heroClass.heroMana -= heroClass.Q_Ability.abilityCost;
 
-            Debug.Log("Used Q Ability!");
-            heroClass.Q_Ability.isCooldown = true;
-            heroClass.Q_Ability.HUDIcon.fillAmount = 1;
+                Debug.Log("Used Q Ability!");
+                heroClass.Q_Ability.isCooldown = true;
+                heroClass.Q_Ability.HUDIcon.fillAmount = 1;
+            }
+            else
+            {
+                Debug.Log("Not enough mana!");
+                systemScript.AlertObservers("Not enough Mana!");
+
+                currentAbility = null;
+                Debug.Log("Q ability was canceled.");
+                Q_Ability_Indicator.enabled = false;
+                Q_Ability_Range.enabled = false;
+            }
+
         }
 
         // Keep track of CD and Hud Icon
@@ -322,11 +340,26 @@ public class NewAbilityTracker : MonoBehaviour
         {
             // FIXME // before instantiation, create a Cast Time buffer and UI element
 
-            CreateAbility(heroClass.W_Ability, W_Projectile, W_Ability_Spawn.transform.position, null, Vector3.zero, false);
+            // Check Mana, then Cast Ability
+            if (heroClass.heroMana >= heroClass.W_Ability.abilityCost)
+            {
+                CreateAbility(heroClass.W_Ability, W_Projectile, W_Ability_Spawn.transform.position, null, Vector3.zero, false);
+                heroClass.heroMana -= heroClass.W_Ability.abilityCost;
 
-            Debug.Log("Used W Ability!");
-            heroClass.W_Ability.isCooldown = true;
-            heroClass.W_Ability.HUDIcon.fillAmount = 1;
+                Debug.Log("Used W Ability!");
+                heroClass.W_Ability.isCooldown = true;
+                heroClass.W_Ability.HUDIcon.fillAmount = 1;
+            }
+            else
+            {
+                Debug.Log("Not enough mana!");
+                systemScript.AlertObservers("Not enough Mana!");
+
+                currentAbility = null;
+                Debug.Log("W ability was canceled.");
+                W_Ability_Indicator.enabled = false;
+                W_Ability_Range.enabled = false;
+            }
         }
 
         // Keep track of CD and Hud Icon

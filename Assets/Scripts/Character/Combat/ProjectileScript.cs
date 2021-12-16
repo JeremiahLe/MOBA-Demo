@@ -21,9 +21,11 @@ public class ProjectileScript : MonoBehaviour
     public Vector3 targetLoc;
     public Vector3 move;
     public bool dieAfterAnimation;
+    bool hitObject;
 
     public GameObject projCreator;
     Rigidbody rb;
+    Collider col;
 
     public EnemyStatsScript enemyStats;
     
@@ -33,8 +35,9 @@ public class ProjectileScript : MonoBehaviour
     {
         sr = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody>();
+        col = GetComponent<Collider>();
 
-        Physics.IgnoreCollision(projCreator.GetComponent<Collider>(), GetComponent<Collider>());
+        Physics.IgnoreCollision(projCreator.GetComponent<Collider>(), col);
 
         TargetableScript[] myItems = FindObjectsOfType(typeof(TargetableScript)) as TargetableScript[];
         //Debug.Log("Found " + myItems.Length + " instances with this script attached");
@@ -42,7 +45,7 @@ public class ProjectileScript : MonoBehaviour
         {
             if (item.GetComponent<TargetableScript>().enemyType != TargetableScript.EnemyType.Minion)
             {
-                Physics.IgnoreCollision(item.gameObject.GetComponent<Collider>(), GetComponent<Collider>());
+                Physics.IgnoreCollision(item.gameObject.GetComponent<Collider>(), col);
             }
         }
 
@@ -51,6 +54,8 @@ public class ProjectileScript : MonoBehaviour
         projAbilityType = (ProjAbilityType)System.Enum.Parse(typeof(ProjAbilityType), projAbilityTypeString);
 
         move = new Vector3(targetLoc.x, targetLoc.y, targetLoc.z);
+
+        hitObject = false;
     }
 
     void Die()
@@ -59,7 +64,7 @@ public class ProjectileScript : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         //Vector3 difference = move - transform.position;
         //float rotationZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
@@ -71,7 +76,6 @@ public class ProjectileScript : MonoBehaviour
                 break;
 
             case ProjAbilityType.AOESkillShot:
-                //
                 break;
 
             default:
@@ -79,7 +83,7 @@ public class ProjectileScript : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         //rb.AddRelativeForce(move * 10 - rb.velocity);
     }
@@ -96,30 +100,34 @@ public class ProjectileScript : MonoBehaviour
 
     private void OnCollisionEnter(Collision colEnemy)
     {
-        enemyStats = colEnemy.gameObject.GetComponent<EnemyStatsScript>();
-
-        float damageCalc = projDamage - (enemyStats.enemyRes * 0.1f);
-
-        damageCalc = Mathf.Round(damageCalc);
-        if (damageCalc <= 1f)
+        // Checks if it already hit something or not. This prevents a singular instance skillshot from hitting multiple tightly grouped enemies. Remove this clause for AOE or Piercing Skillshots.
+        if (hitObject == false)
         {
-            enemyStats.enemyHealth -= 1f;
-            //healthCallRef.CallHealthTrigger(targetedEnemy);
-        }
-        else
-        {
-            enemyStats.enemyHealth -= damageCalc;
-            //healthCallRef.CallHealthTrigger(targetedEnemy);
+            enemyStats = colEnemy.gameObject.GetComponent<EnemyStatsScript>();
+
+            float damageCalc = projDamage - (enemyStats.enemyRes * 0.1f);
+
+            damageCalc = Mathf.Round(damageCalc);
+            if (damageCalc <= 1f)
+            {
+                enemyStats.enemyHealth -= 1f;
+                //healthCallRef.CallHealthTrigger(targetedEnemy);
+            }
+            else
+            {
+                enemyStats.enemyHealth -= damageCalc;
+                //healthCallRef.CallHealthTrigger(targetedEnemy);
+            }
         }
 
         switch (projAbilityType)
         {
             case ProjAbilityType.Skillshot:
+                hitObject = true;
                 Destroy(gameObject);
                 break;
 
             case ProjAbilityType.AOESkillShot:
-                //
                 break;
 
             default:
@@ -129,9 +137,22 @@ public class ProjectileScript : MonoBehaviour
 
     public void AlertObservers(string message)
     {
-        if (message.Equals("Animation End"))
-        {
-            Destroy(gameObject);
+        switch (message) {
+
+            case ("Animation End"):
+                Destroy(gameObject);
+                break;
+
+            case ("Collider Start"):
+                col.enabled = true;
+                break;
+
+            case ("Collider End"):
+                col.enabled = false;
+                break;
+
+            default:
+                break;
         }
     }
 

@@ -16,6 +16,12 @@ public class InputTargeting : MonoBehaviour
 
     [SerializeField] private Image HudTargetWindow;
 
+    [SerializeField] private GameObject mouseClick_Prefab;
+
+    [DisplayWithoutEdit] public float mousePosX;
+    [DisplayWithoutEdit] public float mousePosY;
+    [DisplayWithoutEdit] public float mousePosZ;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -26,11 +32,15 @@ public class InputTargeting : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
         // Minion Targeting
         if (Input.GetMouseButtonDown(1))
         {
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity))
             {
+                GameObject _temp = Instantiate(mouseClick_Prefab, new Vector3(hit.point.x, hit.point.y, hit.point.z), Quaternion.Euler(-90, -0, 0));
+
                 // if minion is targetable
                 if (hit.collider.GetComponent<TargetableScript>() != null)
                 {
@@ -73,8 +83,11 @@ public class InputTargeting : MonoBehaviour
         // Minion Targeting left-click no move
         if (Input.GetMouseButtonDown(0))
         {
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity))
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity))
             {
+
+                GameObject _temp = Instantiate(mouseClick_Prefab, new Vector3(hit.point.x, hit.point.y, hit.point.z), Quaternion.Euler(-90, -0, 0));
+
                 // if minion is targetable
                 if (hit.collider.GetComponent<TargetableScript>() != null)
                 {

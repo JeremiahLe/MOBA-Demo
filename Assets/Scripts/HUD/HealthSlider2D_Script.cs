@@ -28,11 +28,33 @@ public class HealthSlider2D_Script : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        playerSlider3D.maxValue = heroClassScript.heroMaxHealth;
-        playerSlider2D.maxValue = heroClassScript.heroMaxHealth;
+        // If current mana lower than maximum begin regen, otherwise don't overcap
+        if (heroClassScript.heroHealth < heroClassScript.heroMaxHealth)
+            Regen();
+        else if (heroClassScript.heroHealth > heroClassScript.heroMaxHealth)
+            heroClassScript.heroHealth = heroClassScript.heroMaxHealth;
 
-        playerSlider2D.value = heroClassScript.heroHealth;
-        playerSlider3D.value = playerSlider2D.value;
+        // If mana is not below or equal to zero
+        if (heroClassScript.heroHealth > 0f)
+        {
+            playerSlider3D.maxValue = heroClassScript.heroMaxHealth;
+            playerSlider2D.maxValue = heroClassScript.heroMaxHealth;
+
+            playerSlider2D.value = heroClassScript.heroHealth;
+            playerSlider3D.value = playerSlider2D.value;
+        }
+    }
+
+    int interval = 1;
+    float nextTime = 0;
+
+    void Regen()
+    {
+        if (Time.time >= nextTime)
+        {
+            heroClassScript.heroHealth += heroClassScript.heroHealthRegen;
+            nextTime += interval;
+        }
     }
 
     public void CallHealthTrigger(GameObject targetedEnemyRef)

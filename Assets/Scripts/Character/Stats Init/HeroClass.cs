@@ -39,6 +39,9 @@ public class HeroClass : MonoBehaviour
     [DisplayWithoutEdit] public float heroSpeed;
     [DisplayWithoutEdit] public float heroTenacity;
 
+    [DisplayWithoutEdit] public float heroHealthRegen;
+    [DisplayWithoutEdit] public float heroManaRegen;
+
     [Header("Q Ability")]
     public AbilityClass Q_Ability;
     [SerializeField] private Sprite Q_Indicator;
@@ -101,7 +104,10 @@ public class HeroClass : MonoBehaviour
 
         heroSpeed = 5f;
         heroTenacity = 0f;
-}
+
+        heroHealthRegen = 1.0f;
+        heroManaRegen = 2.0f;
+    }
 
     void Start()
     {
@@ -177,7 +183,7 @@ public class HeroClass : MonoBehaviour
         heroHealth = 450f;
         heroMaxHealth = heroHealth;
 
-        heroMana = 100f;
+        heroMana = 200f;
         heroMaxMana = heroMana;
 
         heroAttackDmg = 25f;
@@ -196,6 +202,9 @@ public class HeroClass : MonoBehaviour
         heroSpeed = 5f; // this needs to be set in the NavMesh Agent
         heroTenacity = 0f;
 
+        heroHealthRegen = 1.0f;
+        heroManaRegen = 2.0f;
+
         ///
         /// Q Abililty Init
         ///
@@ -206,7 +215,7 @@ public class HeroClass : MonoBehaviour
         Q_Ability = new AbilityClass();
         Q_Ability.typeOfAbilityCast = AbilityClass.TypeOfAbilityCast.Skillshot;
         Q_Ability.typeOfAbilityCC = AbilityClass.TypeOfAbilityCC.None;
-        Q_Ability.typeOfAbilityDamage = AbilityClass.TypeOfAbilityDamage.AttackDamage;
+        Q_Ability.typeOfAbilityDamage = AbilityClass.TypeOfAbilityDamage.AbilityDamage;
 
         Q_Ability.abilityName = "Cube Shot";
         Q_Ability.abilityCooldown = 2f;
@@ -224,6 +233,8 @@ public class HeroClass : MonoBehaviour
         Q_Ability.abilityCastTime = 0f;
 
         Q_Ability.abilityBaseDamage = 60f;
+
+        Q_Ability.abilityCost = 15f;
 
         // may change this
         //Q_Ability.abilitySprite = Resources.Load<Sprite>("ProjectilePrefabSprites/Fireball_Sprite");
@@ -258,6 +269,8 @@ public class HeroClass : MonoBehaviour
 
         W_Ability.abilityBaseDamage = 110f;
 
+        W_Ability.abilityCost = 45f;
+
         ///
         /// E Abililty Init
         ///
@@ -282,6 +295,10 @@ public class HeroClass : MonoBehaviour
 
         E_Ability.abilityDuration = 1.5f;
         E_Ability.abilityBuffPercentage = .85f;
+
+        E_Ability.abilityBaseDamage = 0f; // it doesn't do damage
+
+        E_Ability.abilityCost = 60f;
 
         ///
         /// R Abililty Init
