@@ -28,7 +28,7 @@ public class HealthSlider2D_Script : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // If current mana lower than maximum begin regen, otherwise don't overcap
+        // If current health lower than maximum begin regen, otherwise don't overcap
         if (heroClassScript.heroHealth < heroClassScript.heroMaxHealth)
             Regen();
         else if (heroClassScript.heroHealth > heroClassScript.heroMaxHealth)
@@ -45,7 +45,7 @@ public class HealthSlider2D_Script : MonoBehaviour
         }
     }
 
-    int interval = 1;
+    int interval = 2;
     float nextTime = 0;
 
     void Regen()

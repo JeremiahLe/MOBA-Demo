@@ -62,6 +62,10 @@ public class NewAbilityTracker : MonoBehaviour
     RectTransform W_Pic;
 
     // R - Targeted Ability
+    [Header("R Manual")]
+    public GameObject R_Projectile;
+    public GameObject targetedEnemyRef;
+    public Transform R_Ability_Spawn;
     private float R_AbilityRangeNum;
 
     #endregion
@@ -414,13 +418,28 @@ public class NewAbilityTracker : MonoBehaviour
         // Use ability?
         if (E_Ability_Indicator.enabled == true && Input.GetMouseButton(0) && currentAbility.abilityKeyCode == E_Ability_Keycode)
         {
-            Debug.Log("Used E Ability!");
-            heroClass.E_Ability.isCooldown = true;
-            heroClass.E_Ability.HUDIcon.fillAmount = 1;
-
-            ///
             float startHeroSpeed = moveScript.agent.speed;
-            moveScript.agent.speed += moveScript.agent.speed * heroClass.E_Ability.abilityBuffPercentage;
+
+            // Check Mana, then Cast
+            if (heroClass.heroMana >= heroClass.E_Ability.abilityCost)
+            {
+                /// Cast Buff
+                moveScript.agent.speed += moveScript.agent.speed * heroClass.E_Ability.abilityBuffPercentage;
+                heroClass.heroMana -= heroClass.E_Ability.abilityCost;
+
+                Debug.Log("Used E Ability!");
+                heroClass.E_Ability.isCooldown = true;
+                heroClass.E_Ability.HUDIcon.fillAmount = 1;
+            }
+            else
+            {
+                systemScript.AlertObservers("Not enough Mana!");
+                currentAbility = null;
+
+                Debug.Log("E ability was canceled.");
+                E_Ability_Indicator.enabled = false;
+                E_Ability_Range.enabled = false;
+            }
 
             if (heroClass.E_Ability.isCooldown)
             {
@@ -483,11 +502,37 @@ public class NewAbilityTracker : MonoBehaviour
         {
             if (Vector3.Distance(gameObject.transform.position, GetComponent<HeroCombat>().targetedEnemy.transform.position) < R_AbilityRangeNum)
             {
-                Debug.Log("Used R Ability!");
-                heroClass.R_Ability.isCooldown = true;
-                heroClass.R_Ability.HUDIcon.fillAmount = 1;
+                // Check Mana, then Cast Ability
+                if (heroClass.heroMana >= heroClass.R_Ability.abilityCost)
+                {
+                    // FIXME // before instantiation, create a Cast Time buffer and UI element
+                    targetedEnemyRef = heroCombat.targetedEnemy;
+                    moveScript.JustStopMovement(true);
+                    //Vector3 relativePos = Q_Ability_TargetTransform.position - transform.position;
 
-                ///
+                    // the second argument, upwards, defaults to Vector3.up
+                    //Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
+                    //transform.rotation = rotation;
+
+                    //transform.LookAt(Q_Ability_TargetTransform.position + transform.forward);
+
+                    CreateAbility(heroClass.R_Ability, R_Projectile, R_Ability_Spawn.transform.position, targetedEnemyRef, targetedEnemyRef.transform.position, true);
+                    heroClass.heroMana -= heroClass.R_Ability.abilityCost;
+
+                    Debug.Log("Used R Ability!");
+                    heroClass.R_Ability.isCooldown = true;
+                    heroClass.R_Ability.HUDIcon.fillAmount = 1;
+                }
+                else
+                {
+                    Debug.Log("Not enough mana!");
+                    systemScript.AlertObservers("Not enough Mana!");
+
+                    currentAbility = null;
+                    Debug.Log("R ability was canceled.");
+                    R_Ability_Indicator.enabled = false;
+                    R_Ability_Range.enabled = false;
+                }
             }
         }
 
@@ -508,13 +553,13 @@ public class NewAbilityTracker : MonoBehaviour
 
     #endregion
     
-    //private void OnDrawGizmosSelected()
-    //{
+    private void OnDrawGizmosSelected()
+    {
         //Gizmos.color = Color.red;
         //Gizmos.DrawWireSphere(transform.position, heroClass.R_Ability.abilityRangeNum);
 
-        //Gizmos.color = Color.blue;
-        //Gizmos.DrawWireSphere(transform.position, heroClass.Q_Ability.abilityRangeNum);
-    //}
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, heroClass.R_Ability.abilityRangeNum);
+    }
     
 }

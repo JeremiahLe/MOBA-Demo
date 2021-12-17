@@ -42,6 +42,8 @@ public class HeroClass : MonoBehaviour
     [DisplayWithoutEdit] public float heroHealthRegen;
     [DisplayWithoutEdit] public float heroManaRegen;
 
+    [DisplayWithoutEdit] public float heroCooldownReduction;
+
     [Header("Q Ability")]
     public AbilityClass Q_Ability;
     [SerializeField] private Sprite Q_Indicator;
@@ -107,6 +109,8 @@ public class HeroClass : MonoBehaviour
 
         heroHealthRegen = 1.0f;
         heroManaRegen = 2.0f;
+
+        heroCooldownReduction = 0.0f;
     }
 
     void Start()
@@ -183,7 +187,7 @@ public class HeroClass : MonoBehaviour
         heroHealth = 450f;
         heroMaxHealth = heroHealth;
 
-        heroMana = 200f;
+        heroMana = 275f;
         heroMaxMana = heroMana;
 
         heroAttackDmg = 25f;
@@ -192,8 +196,8 @@ public class HeroClass : MonoBehaviour
         heroAttackSpeed = .85f;
         heroAttackTime = 1.4f;
 
-        heroDef = 1f;
-        heroRes = 1f;
+        heroDef = 4f;
+        heroRes = 3f;
 
         heroCritChance = 0f;
         heroLifesteal = 0f;
@@ -202,8 +206,10 @@ public class HeroClass : MonoBehaviour
         heroSpeed = 5f; // this needs to be set in the NavMesh Agent
         heroTenacity = 0f;
 
-        heroHealthRegen = 1.0f;
-        heroManaRegen = 2.0f;
+        heroHealthRegen = 2.0f;
+        heroManaRegen = 5.0f;
+
+        heroCooldownReduction = 0.0f;
 
         ///
         /// Q Abililty Init
@@ -218,7 +224,7 @@ public class HeroClass : MonoBehaviour
         Q_Ability.typeOfAbilityDamage = AbilityClass.TypeOfAbilityDamage.AbilityDamage;
 
         Q_Ability.abilityName = "Cube Shot";
-        Q_Ability.abilityCooldown = 2f;
+        Q_Ability.abilityCooldown = 2.5f;
         Q_Ability.HUDIcon = Q_HudIcon;
         Q_Ability.Indicator = Q_Indicator;
         Q_Ability.Range = Q_Range;
@@ -253,7 +259,7 @@ public class HeroClass : MonoBehaviour
         W_Ability.typeOfAbilityDamage = AbilityClass.TypeOfAbilityDamage.AbilityDamage;
 
         W_Ability.abilityName = "Cube Bomb";
-        W_Ability.abilityCooldown = 2f;
+        W_Ability.abilityCooldown = 6f;
         W_Ability.HUDIcon = W_HudIcon;
         W_Ability.Indicator = W_Indicator;
         W_Ability.Range = W_Range;
@@ -285,7 +291,7 @@ public class HeroClass : MonoBehaviour
         E_Ability.typeOfAbilityDamage = AbilityClass.TypeOfAbilityDamage.NoDamage;
 
         E_Ability.abilityName = "Cube Rush";
-        E_Ability.abilityCooldown = 4f;
+        E_Ability.abilityCooldown = 11f;
         E_Ability.HUDIcon = E_HudIcon;
         E_Ability.Indicator = E_Indicator;
         E_Ability.Range = E_Range;
@@ -314,7 +320,7 @@ public class HeroClass : MonoBehaviour
         R_Ability.typeOfAbilityDamage = AbilityClass.TypeOfAbilityDamage.AbilityDamage;
 
         R_Ability.abilityName = "Cube Missile";
-        R_Ability.abilityCooldown = 60f;
+        R_Ability.abilityCooldown = 35f;
         R_Ability.HUDIcon = R_HudIcon;
         R_Ability.Indicator = R_Indicator;
         R_Ability.Range = R_Range;
@@ -324,5 +330,12 @@ public class HeroClass : MonoBehaviour
 
         R_Ability.abilityDuration = 0f;
         R_Ability.abilityBuffPercentage = 0f;
+
+        R_Ability.abilitySpeed = 25f; // moderately fast (targeted abilities scale higher ~ 40 being gigaspeed
+        R_Ability.abilityCastTime = 0f;
+
+        R_Ability.abilityBaseDamage = 150f;
+
+        R_Ability.abilityCost = 100f;
     }
 }

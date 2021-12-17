@@ -41,7 +41,7 @@ public class ManaSlider2D_Script : MonoBehaviour
         }
     }
 
-    int interval = 1;
+    int interval = 2;
     float nextTime = 0;
 
     void Regen()

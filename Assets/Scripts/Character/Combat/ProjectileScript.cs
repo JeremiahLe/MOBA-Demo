@@ -17,15 +17,21 @@ public class ProjectileScript : MonoBehaviour
     public float projRange;
 
     public bool projTargeted;
+
     public GameObject target;
+
     public Vector3 targetLoc;
+    public Vector3 targetedPosFromTarget;
     public Vector3 move;
+
     public bool dieAfterAnimation;
     bool hitObject;
 
     public GameObject projCreator;
     Rigidbody rb;
     Collider col;
+
+    float rotationForce = 250f;
 
     public EnemyStatsScript enemyStats;
     
@@ -37,25 +43,38 @@ public class ProjectileScript : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
 
-        Physics.IgnoreCollision(projCreator.GetComponent<Collider>(), col);
+        projAbilityType = (ProjAbilityType)System.Enum.Parse(typeof(ProjAbilityType), projAbilityTypeString);
 
+        Physics.IgnoreCollision(projCreator.GetComponent<Collider>(), col);
         TargetableScript[] myItems = FindObjectsOfType(typeof(TargetableScript)) as TargetableScript[];
+
         //Debug.Log("Found " + myItems.Length + " instances with this script attached");
+
         foreach (TargetableScript item in myItems)
         {
-            if (item.GetComponent<TargetableScript>().enemyType != TargetableScript.EnemyType.Minion)
+            if (item.GetComponent<TargetableScript>().enemyType != TargetableScript.EnemyType.Minion) // needs to check for enemy champs in the future
             {
                 Physics.IgnoreCollision(item.gameObject.GetComponent<Collider>(), col);
             }
         }
 
-        Invoke("Die", projRange);
+        switch (projAbilityType)
+        {
+            case (ProjAbilityType.Skillshot):
+                hitObject = false;
+                Invoke("Die", projRange);
+                move = new Vector3(targetLoc.x, targetLoc.y, targetLoc.z);
+                break;
 
-        projAbilityType = (ProjAbilityType)System.Enum.Parse(typeof(ProjAbilityType), projAbilityTypeString);
+            case (ProjAbilityType.Targeted):
+                targetedPosFromTarget = target.transform.position;
+                break;
 
-        move = new Vector3(targetLoc.x, targetLoc.y, targetLoc.z);
+            default:
+                Debug.Log("Missing projectile type?");
+                break;
+        }
 
-        hitObject = false;
     }
 
     void Die()
@@ -78,7 +97,25 @@ public class ProjectileScript : MonoBehaviour
             case ProjAbilityType.AOESkillShot:
                 break;
 
+            case ProjAbilityType.Targeted:
+                if (target != null)
+                {
+                    if (targetedPosFromTarget != Vector3.zero)
+                    {
+                        transform.rotation = Quaternion.Slerp(
+                            transform.rotation,
+                            Quaternion.LookRotation(targetedPosFromTarget),
+                            Time.deltaTime * rotationForce
+                        );
+                    }
+                    transform.position = Vector3.MoveTowards(transform.position, targetedPosFromTarget, projSpeed * Time.deltaTime);
+                }
+                else
+                    Destroy(gameObject);
+                break;
+
             default:
+                Debug.Log("Missing projectile type?");
                 break;
         }
     }
@@ -95,12 +132,28 @@ public class ProjectileScript : MonoBehaviour
         //float rotationQ = Mathf.SmoothDampAngle(transform.eulerAngles.y, rotationToLookAt.eulerAngles.y, ref projSpeed,
         //0.75f * (Time.deltaTime * 5));
 
-        transform.rotation = Quaternion.LookRotation(Vector3.up, -move); // negative flips it the correct orientation if needed
+        switch (projAbilityType)
+        {
+            case ProjAbilityType.Skillshot:
+                transform.rotation = Quaternion.LookRotation(Vector3.up, -move); // negative flips it the correct orientation if needed
+                break;
+
+            case ProjAbilityType.Targeted:
+                if (target != null)
+                    transform.rotation = Quaternion.LookRotation(Vector3.up, -targetedPosFromTarget);
+                break;
+
+            default:
+                Debug.Log("Missing projectile type?");
+                break;
+        }
     }
 
     private void OnCollisionEnter(Collision colEnemy)
     {
         // Checks if it already hit something or not. This prevents a singular instance skillshot from hitting multiple tightly grouped enemies. Remove this clause for AOE or Piercing Skillshots.
+        #region Old damage code
+        /*
         if (hitObject == false)
         {
             enemyStats = colEnemy.gameObject.GetComponent<EnemyStatsScript>();
@@ -119,19 +172,52 @@ public class ProjectileScript : MonoBehaviour
                 //healthCallRef.CallHealthTrigger(targetedEnemy);
             }
         }
+        */
+        #endregion
 
         switch (projAbilityType)
         {
             case ProjAbilityType.Skillshot:
+                DealDamage(colEnemy.gameObject.GetComponent<EnemyStatsScript>());
                 hitObject = true;
                 Destroy(gameObject);
                 break;
 
             case ProjAbilityType.AOESkillShot:
+                DealDamage(colEnemy.gameObject.GetComponent<EnemyStatsScript>());
+                break;
+
+            case ProjAbilityType.Targeted:
+                if (target == colEnemy.gameObject)
+                {
+                    DealDamage(colEnemy.gameObject.GetComponent<EnemyStatsScript>());
+                    Destroy(gameObject);
+                }
                 break;
 
             default:
+                Debug.Log("Missing projectile type?");
                 break;
+        }
+    }
+
+    public void DealDamage(EnemyStatsScript enemyStats)
+    {
+        if (hitObject == false)
+        {
+            float damageCalc = projDamage - (enemyStats.enemyRes * 0.1f);
+            damageCalc = Mathf.Round(damageCalc);
+
+            if (damageCalc <= 1f)
+            {
+                enemyStats.enemyHealth -= 1f;
+                //healthCallRef.CallHealthTrigger(targetedEnemy);
+            }
+            else
+            {
+                enemyStats.enemyHealth -= damageCalc;
+                //healthCallRef.CallHealthTrigger(targetedEnemy);
+            }
         }
     }
 
