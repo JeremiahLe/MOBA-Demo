@@ -107,6 +107,7 @@ MonoBehaviour:
   projTargeted: 0
   target: {fileID: 0}
   targetLoc: {x: 0, y: 0, z: 0}
+  targetedPosFromTarget: {x: 0, y: 0, z: 0}
   move: {x: 0, y: 0, z: 0}
   dieAfterAnimation: 0
   projCreator: {fileID: 0}
@@ -125,7 +126,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 4
+  m_Constraints: 14
   m_CollisionDetection: 1
 --- !u!65 &7759711968159375640
 BoxCollider:

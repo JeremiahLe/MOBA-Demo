@@ -273,7 +273,7 @@ public class HeroClass : MonoBehaviour
         W_Ability.abilitySpeed = 0f; // it doesn't move
         W_Ability.abilityCastTime = 0f;
 
-        W_Ability.abilityBaseDamage = 110f;
+        W_Ability.abilityBaseDamage = 90f;
 
         W_Ability.abilityCost = 45f;
 

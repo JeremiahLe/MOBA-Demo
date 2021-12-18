@@ -44,4 +44,6 @@ public class GameControl_Script : MonoBehaviour
             HUDWindow.TurnOffWindow();
         }
     }
+
 }
+

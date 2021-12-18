@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class ProjectileScript : MonoBehaviour
 {
@@ -34,8 +35,11 @@ public class ProjectileScript : MonoBehaviour
     float rotationForce = 250f;
 
     public EnemyStatsScript enemyStats;
-    
 
+    GameControl_Script gsScript;
+
+    public GameObject DamageTextPopup_object;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -207,6 +211,12 @@ public class ProjectileScript : MonoBehaviour
         {
             float damageCalc = projDamage - (enemyStats.enemyRes * 0.1f);
             damageCalc = Mathf.Round(damageCalc);
+
+            DamageTextPopup_object = Resources.Load<GameObject>("Prefabs/DamagePopup_UI");
+            GameObject go = Instantiate(DamageTextPopup_object, transform.position + new Vector3(Random.Range(-1f, 1f),
+        Random.Range(0, 0), 0), Quaternion.identity);
+            go.GetComponent<DamageText_UI>().damageNumber.text = "-" + damageCalc.ToString();
+            go.GetComponent<EnemyHealthSlider>().typeOfObject = "UI";
 
             if (damageCalc <= 1f)
             {

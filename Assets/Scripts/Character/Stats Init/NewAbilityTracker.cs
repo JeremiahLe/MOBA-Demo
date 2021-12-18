@@ -67,6 +67,7 @@ public class NewAbilityTracker : MonoBehaviour
     public GameObject targetedEnemyRef;
     public Transform R_Ability_Spawn;
     private float R_AbilityRangeNum;
+    public bool R_Ability_MoveThenInRange = false;
 
     #endregion
 
@@ -75,6 +76,8 @@ public class NewAbilityTracker : MonoBehaviour
     [SerializeField] private Transform playerTransform;
     [SerializeField] private LayerMask terrainMask;
     [SerializeField] private SystemNotificationManager_Script systemScript;
+
+    public bool Ability_MoveInRangeCast = false;
     #endregion
 
     #region Component Initilization
@@ -130,6 +133,10 @@ public class NewAbilityTracker : MonoBehaviour
         W_Ability();
         E_Ability();
         R_Ability();
+
+        // Made this for targeted ability casting once in range
+        if (currentAbility != null && currentAbility.typeOfAbilityCast == AbilityClass.TypeOfAbilityCast.Targeted)
+            CastAbilityOnceInRange(currentAbility, currentAbility.abilityRangeNum);
 
         // Canvas Control for abilities
         RaycastHit hit;
@@ -212,6 +219,51 @@ public class NewAbilityTracker : MonoBehaviour
         _temp.GetComponent<ProjectileScript>().projCreator = gameObject;
         _temp.GetComponent<ProjectileScript>().projRange = _ability.abilityRangeNum / 14f; // FIXME // WHEN PROJ OUT OF RANGE, DESTROY
         _temp.GetComponent<ProjectileScript>().projTargeted = _targeted;
+    }
+
+    void CastAbilityOnceInRange(AbilityClass _currentAbility, float _range) // TODO - make it so that it is more universal
+    {
+        if (R_Ability_MoveThenInRange && heroCombat.targetedEnemy != null)
+        {
+            if (Vector3.Distance(gameObject.transform.position, heroCombat.targetedEnemy.transform.position) < _range)
+            {
+                Debug.Log("In range!!!!");
+
+                // Check Mana, then Cast Ability
+                if (heroClass.heroMana >= heroClass.R_Ability.abilityCost)
+                {
+                    // FIXME // before instantiation, create a Cast Time buffer and UI element
+                    targetedEnemyRef = heroCombat.targetedEnemy;
+                    moveScript.JustStopMovement(true);
+                    //Vector3 relativePos = Q_Ability_TargetTransform.position - transform.position;
+
+                    // the second argument, upwards, defaults to Vector3.up
+                    //Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
+                    //transform.rotation = rotation;
+
+                    //transform.LookAt(Q_Ability_TargetTransform.position + transform.forward);
+
+                    CreateAbility(heroClass.R_Ability, R_Projectile, R_Ability_Spawn.transform.position, targetedEnemyRef, targetedEnemyRef.transform.position, true);
+                    heroClass.heroMana -= heroClass.R_Ability.abilityCost;
+
+                    Debug.Log("Used R Ability!");
+                    heroClass.R_Ability.isCooldown = true;
+                    heroClass.R_Ability.HUDIcon.fillAmount = 1;
+                    R_Ability_MoveThenInRange = false;
+                }
+                else // not enough mana
+                {
+                    Debug.Log("Not enough mana!");
+                    systemScript.AlertObservers("Not enough Mana!");
+
+                    currentAbility = null;
+                    Debug.Log("R ability was canceled.");
+                    R_Ability_Indicator.enabled = false;
+                    R_Ability_Range.enabled = false;
+                    R_Ability_MoveThenInRange = false;
+                }
+            }
+        }
     }
 
 
@@ -498,10 +550,24 @@ public class NewAbilityTracker : MonoBehaviour
         }
 
         // Use ability?
-        if (R_Ability_Indicator.enabled == true && Input.GetMouseButton(0) && currentAbility.abilityKeyCode == R_Ability_Keycode && GetComponent<HeroCombat>().targetedEnemy != null)
+        if (R_Ability_Indicator.enabled == true && Input.GetMouseButton(0) && currentAbility.abilityKeyCode == R_Ability_Keycode && heroCombat.targetedEnemy != null)
         {
-            if (Vector3.Distance(gameObject.transform.position, GetComponent<HeroCombat>().targetedEnemy.transform.position) < R_AbilityRangeNum)
+            if (Vector3.Distance(gameObject.transform.position, heroCombat.targetedEnemy.transform.position) > R_AbilityRangeNum)
             {
+                if (heroCombat.targetedEnemy != null)
+                {
+                    moveScript.agent.SetDestination(heroCombat.targetedEnemy.transform.position);
+                    moveScript.agent.stoppingDistance = R_AbilityRangeNum;
+
+                    Debug.Log("Out of range!!!!");
+
+                    R_Ability_MoveThenInRange = true;
+                }
+            }
+            else if (Vector3.Distance(gameObject.transform.position, heroCombat.targetedEnemy.transform.position) < R_AbilityRangeNum)
+            {
+                Debug.Log("In range!!!!");
+
                 // Check Mana, then Cast Ability
                 if (heroClass.heroMana >= heroClass.R_Ability.abilityCost)
                 {
@@ -523,7 +589,7 @@ public class NewAbilityTracker : MonoBehaviour
                     heroClass.R_Ability.isCooldown = true;
                     heroClass.R_Ability.HUDIcon.fillAmount = 1;
                 }
-                else
+                else // not enough mana
                 {
                     Debug.Log("Not enough mana!");
                     systemScript.AlertObservers("Not enough Mana!");
@@ -553,13 +619,13 @@ public class NewAbilityTracker : MonoBehaviour
 
     #endregion
     
-    private void OnDrawGizmosSelected()
-    {
+    //private void OnDrawGizmosSelected()
+    //{
         //Gizmos.color = Color.red;
         //Gizmos.DrawWireSphere(transform.position, heroClass.R_Ability.abilityRangeNum);
 
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position, heroClass.R_Ability.abilityRangeNum);
-    }
+        //Gizmos.color = Color.blue;
+        //Gizmos.DrawWireSphere(transform.position, heroClass.R_Ability.abilityRangeNum);
+    //}
     
 }
