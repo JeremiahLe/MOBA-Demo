@@ -29,6 +29,11 @@ public class SystemNotificationManager_Script : MonoBehaviour
                 anim.SetBool("AnimTrigger", true);
                 break;
 
+            case ("Ability is on cooldown!"):
+                systemMessage.text = message;
+                anim.SetBool("AnimTrigger", true);
+                break;
+
             case ("Animation End"):
                 systemMessage.text = "";
                 anim.SetBool("AnimTrigger", false);

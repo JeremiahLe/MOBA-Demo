@@ -8,6 +8,7 @@ TagManager:
   - Floor
   - MyPlayer
   - HUDWindowTag
+  - Q_Canvas
   layers:
   - Default
   - TransparentFX

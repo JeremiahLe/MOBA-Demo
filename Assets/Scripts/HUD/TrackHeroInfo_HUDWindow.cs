@@ -62,7 +62,7 @@ public class TrackHeroInfo_HUDWindow : MonoBehaviour
 
         HeroHudStats.text = string.Format(
                     "Lvl {0}\n" +
-                    "    {1}             {2}\n" +
+                    "    {1}              {2}\n" +
                     "    {3}              {4}\n" +
                     "    {5}%           {6}\n" +
                     "    {7}%           {8}%\n" +
@@ -161,7 +161,7 @@ public class TrackHeroInfo_HUDWindow : MonoBehaviour
             {
                 HeroHudStats.text = string.Format(
                     "Lvl {0}\n" +
-                    "    {1}          {2}\n" +
+                    "    {1}           {2}\n" +
                     "    {3}            {4}\n" +
                     "    {5}%         {6}\n" +
                     "    {7}%         {8}%\n" +

@@ -73,6 +73,9 @@ public class ProjectileScript : MonoBehaviour
             case (ProjAbilityType.Targeted):
                 targetedPosFromTarget = target.transform.position;
                 break;
+            
+            case (ProjAbilityType.AOESkillShot):
+                break;
 
             default:
                 Debug.Log("Missing projectile type?");
@@ -145,6 +148,9 @@ public class ProjectileScript : MonoBehaviour
             case ProjAbilityType.Targeted:
                 if (target != null)
                     transform.rotation = Quaternion.LookRotation(Vector3.up, -targetedPosFromTarget);
+                break;
+
+            case ProjAbilityType.AOESkillShot:
                 break;
 
             default:

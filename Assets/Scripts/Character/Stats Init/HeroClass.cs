@@ -9,7 +9,7 @@ using UnityEngine.UI;
 /// 
 public class HeroClass : MonoBehaviour
 {
-    public enum HeroAssigner { Cube, Jawn }
+    public enum HeroAssigner { Ekard, Jawn }
     public HeroAssigner heroAssigner;
     [DisplayWithoutEdit] public string HeroName;
     [DisplayWithoutEdit] public Sprite heroHUDSprite;
@@ -141,7 +141,7 @@ public class HeroClass : MonoBehaviour
     {
         switch (heroAssigner)
         {
-            case HeroAssigner.Cube:
+            case HeroAssigner.Ekard:
                 Hero_Cube_Ability_Init();
                 Debug.Log("Assigned Hero is " + HeroName);
                 break;
@@ -162,8 +162,8 @@ public class HeroClass : MonoBehaviour
 
         switch (heroAssigner)
         {
-            case (HeroAssigner.Cube):
-                heroHUDSprite = Resources.Load<Sprite>("HeroHUDIcons/Mina_HUD_Sprite");
+            case (HeroAssigner.Ekard):
+                heroHUDSprite = Resources.Load<Sprite>("HeroHUDIcons/Ekard_HUD_Sprite");
                 Debug.Log("Loaded " + heroAssigner.ToString() + " sprite");
                 break;
 
@@ -182,7 +182,7 @@ public class HeroClass : MonoBehaviour
         /// 
 
         heroLevel = 1;
-        Load_HeroHUDSprite(HeroAssigner.Cube);
+        Load_HeroHUDSprite(HeroAssigner.Ekard);
 
         heroHealth = 450f;
         heroMaxHealth = heroHealth;
@@ -282,7 +282,7 @@ public class HeroClass : MonoBehaviour
         ///
 
         /// Ability Summary:
-        /// Cast to gain a burst of movement speed for a few seconds.
+        /// Cast to gain a burst of movement speed and attack speed for a few seconds.
         /// 
 
         E_Ability = new AbilityClass();
@@ -299,8 +299,8 @@ public class HeroClass : MonoBehaviour
 
         E_Ability.abilityRangeNum = 1f;
 
-        E_Ability.abilityDuration = 1.5f;
-        E_Ability.abilityBuffPercentage = .85f;
+        E_Ability.abilityDuration = 2.5f;
+        E_Ability.abilityBuffPercentage = .45f;
 
         E_Ability.abilityBaseDamage = 0f; // it doesn't do damage
 

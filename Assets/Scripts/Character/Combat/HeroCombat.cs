@@ -16,6 +16,7 @@ public class HeroCombat : MonoBehaviour
     public bool moveToEnemy = false;
 
     public GameObject prevEnemyRef;
+    public GameObject enemyToAttack;
 
     // Combat range visuals
     [SerializeField] private Image attackRange_Indicator;
@@ -28,21 +29,28 @@ public class HeroCombat : MonoBehaviour
     // Character Animator
     private CharacterMovementScript moveScript;
     private HeroClass heroClassScript;
-    private Animator anim;
+    public Animator anim;
 
     // Combat Variables
     public bool basicAtkIdle = false;
     public bool isHeroAlive;
     public bool performMeleeAttack = true;
+    public bool notCasting = true;
+    public float priorHeroAttackSpeed;
+
+    // Other
+    public GameObject DamageTextPopup_object;
 
     // Start is called before the first frame update
     void Start()
     {
         moveScript = GetComponent<CharacterMovementScript>();
         heroClassScript = GetComponent<HeroClass>();
-        anim = GetComponent<Animator>();
+        anim = GetComponentInChildren<Animator>();
 
-        attackRange_Indicator_Image = attackRange_Indicator.GetComponent<Image>();
+        DamageTextPopup_object = Resources.Load<GameObject>("Prefabs/DamagePopup_UI");
+
+        //attackRange_Indicator_Image = attackRange_Indicator.GetComponent<Image>();
 
         // This is defunct code to scale the image of the attack range properly
         radius = heroAttackRange / 2.0f / 2.0f / 2.0f / 1.25f;
@@ -51,11 +59,11 @@ public class HeroCombat : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        CheckAttackRange();
+        //CheckAttackRange();
 
         CheckCombat();
 
-        attackRange_Indicator.transform.localScale = new Vector3(radius + offset, radius + offset, radius + offset);
+        //attackRange_Indicator.transform.localScale = new Vector3(radius + offset, radius + offset, radius + offset);
     }
 
     void CheckCombat()
@@ -77,6 +85,8 @@ public class HeroCombat : MonoBehaviour
                 {
                     FaceTarget();
 
+                    StopCoroutine(MeleeAttackInterval());
+
                     if (performMeleeAttack)
                     {
 
@@ -93,12 +103,14 @@ public class HeroCombat : MonoBehaviour
         {
             anim.SetBool("Basic Attack", false); // fix ghost autos?
             performMeleeAttack = true;
+            prevEnemyRef = null;
+            enemyToAttack = null;
         }
     }
 
     IEnumerator MeleeAttackInterval()
     {
-
+        prevEnemyRef = targetedEnemy;
         performMeleeAttack = false;
         anim.SetFloat("AttackAnimSpeed", heroClassScript.heroAttackSpeed);
         anim.SetBool("Basic Attack", true);
@@ -114,7 +126,7 @@ public class HeroCombat : MonoBehaviour
 
     public void MeleeAttack()
     {
-        if (targetedEnemy != null)
+        if (targetedEnemy != null && targetedEnemy == prevEnemyRef)
         {
             //if (targetedEnemy.GetComponent<TargetableScript>().enemyType == TargetableScript.EnemyType.Minion)
             //if (targetedEnemy == prevEnemyRef)
@@ -125,13 +137,18 @@ public class HeroCombat : MonoBehaviour
 
             if (damageCalc <= 1f)
             {
-                targetedEnemy.GetComponent<EnemyStatsScript>().enemyHealth -= 1f;
+                damageCalc = 1f;
+                targetedEnemy.GetComponent<EnemyStatsScript>().enemyHealth -= damageCalc;
             }
             else
             {
                 targetedEnemy.GetComponent<EnemyStatsScript>().enemyHealth -= damageCalc;
             }
 
+            GameObject go = Instantiate(DamageTextPopup_object, targetedEnemy.transform.position + new Vector3(Random.Range(-1f, 1f),
+        Random.Range(0, 0), 0), Quaternion.identity);
+            go.GetComponent<DamageText_UI>().damageNumber.text = "-" + damageCalc.ToString();
+            go.GetComponent<EnemyHealthSlider>().typeOfObject = "UI";
         }
 
         performMeleeAttack = true;
@@ -157,20 +174,52 @@ public class HeroCombat : MonoBehaviour
 
     void FaceTarget()
     {
-        // Rotation ??
-        Quaternion rotationToLookAt = Quaternion.LookRotation(targetedEnemy.transform.position - transform.position);
-        float rotationY = Mathf.SmoothDampAngle(transform.eulerAngles.y,
-            rotationToLookAt.eulerAngles.y,
-            ref moveScript.rotateVelocity,
-            heroRotateSpeedForAttack * (Time.deltaTime * 5));
+        if (notCasting)
+        {
+            // Rotation ??
+            Quaternion rotationToLookAt = Quaternion.LookRotation(targetedEnemy.transform.position - transform.position);
+            float rotationY = Mathf.SmoothDampAngle(transform.eulerAngles.y,
+                rotationToLookAt.eulerAngles.y,
+                ref moveScript.rotateVelocity,
+                heroRotateSpeedForAttack * (Time.deltaTime * 5));
 
-        transform.eulerAngles = new Vector3(0, rotationY, 0);
+            transform.eulerAngles = new Vector3(0, rotationY, 0);
+        }
     }
 
-    public void ResetAutoAttack()
+    public void CallAbilityCast(float _castTime)
     {
+        notCasting = false;
+        Invoke("ResetAbilityCastLockout", _castTime);
+    }
+
+    public void ResetAbilityCastLockout()
+    {
+        notCasting = true;
+    }
+
+    public void ResetAutoAttack(bool _AbilityCast)
+    {
+        priorHeroAttackSpeed = heroClassScript.heroAttackSpeed;
+
+        if (_AbilityCast)
+        {
+            //Debug.Log("Reset Auto Attack Called", this);
+            heroClassScript.heroAttackSpeed = 7.0f;
+        }
+
+        anim.StopPlayback();
+        performMeleeAttack = false;
         anim.SetBool("Basic Attack", false);
+        StopCoroutine(MeleeAttackInterval());
+        Invoke("ResetCanAttack", 0.3f);
+        //performMeleeAttack = true;
+    }
+
+    public void ResetCanAttack()
+    {
         performMeleeAttack = true;
+        heroClassScript.heroAttackSpeed = priorHeroAttackSpeed;
     }
 
     //private void OnDrawGizmosSelected()

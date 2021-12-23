@@ -29,7 +29,6 @@ public class EnemyHealth_Slider_Script : MonoBehaviour
             enemySlider3D.value = enemyStatsScript.enemyHealth;
             enemySlider3D.maxValue = enemyStatsScript.enemyMaxHealth;
         }
-
     }
 }
 

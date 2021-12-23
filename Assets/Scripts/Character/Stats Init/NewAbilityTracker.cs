@@ -15,35 +15,51 @@ public class NewAbilityTracker : MonoBehaviour
     [DisplayWithoutEdit] public AbilityClass currentAbility;
 
     [Header("Q Ability")]
-    [SerializeField] private Canvas Q_Ability_Canvas;
-    [SerializeField] private Image Q_Ability_Indicator;
-    [SerializeField] private Image Q_Ability_Range;
+    [SerializeField] private GameObject Q_Ability_Range_GameObject;
+    [SerializeField] private GameObject Q_Ability_Indicator_GameObject;
+    [SerializeField] private GameObject Q_Ability_Parent_GameObject;
+    [SerializeField] private Sprite Q_Ability_Range_Sprite;
+    [SerializeField] private Sprite Q_Ability_Indicator_Sprite;
+    [SerializeField] private SpriteRenderer Q_Ability_Range_SpriteRenderer;
+    [SerializeField] private SpriteRenderer Q_Ability_Indicator_SpriteRenderer;
     [SerializeField] private KeyCode Q_Ability_Keycode;
 
     [Header("W Ability")]
-    [SerializeField] private Canvas W_Ability_Canvas;
-    [SerializeField] private Image W_Ability_Indicator;
-    [SerializeField] private Image W_Ability_Range;
+    [SerializeField] private GameObject W_Ability_Range_GameObject;
+    [SerializeField] private GameObject W_Ability_Indicator_GameObject;
+    [SerializeField] private GameObject W_Ability_Parent_GameObject;
+    [SerializeField] private Sprite W_Ability_Range_Sprite;
+    [SerializeField] private Sprite W_Ability_Indicator_Sprite;
+    [SerializeField] private SpriteRenderer W_Ability_Range_SpriteRenderer;
+    [SerializeField] private SpriteRenderer W_Ability_Indicator_SpriteRenderer;
     [SerializeField] private KeyCode W_Ability_Keycode;
 
     [Header("E Ability")]
-    [SerializeField] private Canvas E_Ability_Canvas;
-    [SerializeField] private Image E_Ability_Indicator;
-    [SerializeField] private Image E_Ability_Range;
+    [SerializeField] private GameObject E_Ability_Range_GameObject;
+    [SerializeField] private GameObject E_Ability_Indicator_GameObject;
+    [SerializeField] private GameObject E_Ability_Parent_GameObject;
+    [SerializeField] private Sprite E_Ability_Range_Sprite;
+    [SerializeField] private Sprite E_Ability_Indicator_Sprite;
+    [SerializeField] private SpriteRenderer E_Ability_Range_SpriteRenderer;
+    [SerializeField] private SpriteRenderer E_Ability_Indicator_SpriteRenderer;
     [SerializeField] private KeyCode E_Ability_Keycode;
 
     [Header("R Ability")]
-    [SerializeField] private Canvas R_Ability_Canvas;
-    [SerializeField] private Image R_Ability_Indicator;
-    [SerializeField] private Image R_Ability_Range;
+    [SerializeField] private GameObject R_Ability_Range_GameObject;
+    [SerializeField] private GameObject R_Ability_Indicator_GameObject;
+    [SerializeField] private GameObject R_Ability_Parent_GameObject;
+    [SerializeField] private Sprite R_Ability_Range_Sprite;
+    [SerializeField] private Sprite R_Ability_Indicator_Sprite;
+    [SerializeField] private SpriteRenderer R_Ability_Range_SpriteRenderer;
+    [SerializeField] private SpriteRenderer R_Ability_Indicator_SpriteRenderer;
     [SerializeField] private KeyCode R_Ability_Keycode;
 
     // This is where unique ability input goes
-    // Q - Skillshot
     [Header("Other Ability Setup (Case by Case)")]
+    [SerializeField] private Sprite NoVisual_Sprite;
     private GameObject projectilePrefab;
-    [DisplayWithoutEdit] public string Seperator;
 
+    // Q - Skillshot
     [Header("Q Manual")]
     public GameObject Q_Projectile;
     private Vector3 position;
@@ -57,9 +73,12 @@ public class NewAbilityTracker : MonoBehaviour
     [SerializeField] private float AOESkillshot_MaxAbility_Distance;
     public GameObject W_Projectile;
     public Transform W_Ability_Spawn;
-
     // This is a situational adjustment to the W indicator clipping through higher terrain / may be obsolete in the future
-    RectTransform W_Pic;
+    //RectTransform W_Pic;
+
+    // E - Self buff
+    [Header("E Manual")]
+    public ParticleSystem E_VFX_ParticleSystem;
 
     // R - Targeted Ability
     [Header("R Manual")]
@@ -78,6 +97,7 @@ public class NewAbilityTracker : MonoBehaviour
     [SerializeField] private SystemNotificationManager_Script systemScript;
 
     public bool Ability_MoveInRangeCast = false;
+    public float startHeroSpeed;
     #endregion
 
     #region Component Initilization
@@ -86,7 +106,7 @@ public class NewAbilityTracker : MonoBehaviour
     HeroCombat heroCombat;
     #endregion
 
-    private void Start()
+    void Start()
     {
         // Get our hero class component, getting each ability etc.
         heroClass = GetComponent<HeroClass>();
@@ -94,35 +114,48 @@ public class NewAbilityTracker : MonoBehaviour
         heroCombat = gameObject.GetComponent<HeroCombat>();
         systemScript = FindObjectOfType<SystemNotificationManager_Script>();
 
+        // Ability GetComponents
+        Q_Ability_Indicator_SpriteRenderer = Q_Ability_Indicator_GameObject.GetComponent<SpriteRenderer>();
+        Q_Ability_Range_SpriteRenderer = Q_Ability_Range_GameObject.GetComponent<SpriteRenderer>();
+
+        W_Ability_Indicator_SpriteRenderer = W_Ability_Indicator_GameObject.GetComponent<SpriteRenderer>();
+        W_Ability_Range_SpriteRenderer = W_Ability_Range_GameObject.GetComponent<SpriteRenderer>();
+
+        E_Ability_Indicator_SpriteRenderer = E_Ability_Indicator_GameObject.GetComponent<SpriteRenderer>();
+        E_Ability_Range_SpriteRenderer = E_Ability_Range_GameObject.GetComponent<SpriteRenderer>();
+
+        //R_Ability_Indicator_SpriteRenderer = R_Ability_Indicator_GameObject.GetComponent<SpriteRenderer>();
+        //R_Ability_Range_SpriteRenderer = R_Ability_Range_GameObject.GetComponent<SpriteRenderer>();
+
         // Debug //
-        // Set every canvas image to nonvisible at runtime.
-        Q_Ability_Indicator.enabled = false;
-        Q_Ability_Range.enabled = false;
+        // Set every Ability GameObject sprite to nonvisible at runtime.
+        Q_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+        Q_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
 
-        W_Ability_Indicator.enabled = false;
-        W_Ability_Range.enabled = false;
+        W_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+        W_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
 
-        E_Ability_Indicator.enabled = false;
-        E_Ability_Range.enabled = false;
+        E_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+        E_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
 
-        R_Ability_Indicator.enabled = false;
-        R_Ability_Range.enabled = false;
+        //R_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+        //R_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
 
         #region Case By Case Hero Init
 
         // Q Ability - Cube
-        Q_Ability_RangeNum = heroClass.Q_Ability.abilityRangeNum;
-        Q_Ability_Indicator.rectTransform.localScale = new Vector2(Q_Ability_Indicator.rectTransform.localScale.x, Q_Ability_RangeNum * 0.05f);
+        //Q_Ability_RangeNum = heroClass.Q_Ability.abilityRangeNum;
+        //Q_Ability_Indicator.rectTransform.localScale = new Vector2(Q_Ability_Indicator.rectTransform.localScale.x, Q_Ability_RangeNum * 0.05f);
 
         // W Ability - Cube
-        AOESkillshot_MaxAbility_Distance = heroClass.W_Ability.abilityRangeNum;
-        W_Ability_Range.rectTransform.localScale = new Vector2(AOESkillshot_MaxAbility_Distance * 0.1f, AOESkillshot_MaxAbility_Distance * 0.1f);
-        RectTransform AOESkillshot_Container = W_Ability_Indicator.GetComponent<RectTransform>();
-        AOESkillshot_Container.anchoredPosition3D = new Vector3(AOESkillshot_Container.anchoredPosition3D.x, AOESkillshot_Container.anchoredPosition3D.y + 10, AOESkillshot_Container.anchoredPosition3D.z);
+        //AOESkillshot_MaxAbility_Distance = heroClass.W_Ability.abilityRangeNum;
+        //W_Ability_Range.rectTransform.localScale = new Vector2(AOESkillshot_MaxAbility_Distance * 0.1f, AOESkillshot_MaxAbility_Distance * 0.1f);
+        //RectTransform AOESkillshot_Container = W_Ability_Indicator_Image.GetComponent<RectTransform>();
+        //AOESkillshot_Container.anchoredPosition3D = new Vector3(AOESkillshot_Container.anchoredPosition3D.x, AOESkillshot_Container.anchoredPosition3D.y + 10, AOESkillshot_Container.anchoredPosition3D.z);
 
         // R Ability - Cube
-        R_AbilityRangeNum = heroClass.R_Ability.abilityRangeNum;
-        R_Ability_Range.rectTransform.localScale = new Vector2(R_AbilityRangeNum * 0.1f, R_AbilityRangeNum * 0.1f);
+        //R_AbilityRangeNum = heroClass.R_Ability.abilityRangeNum;
+        //R_Ability_Range.rectTransform.localScale = new Vector2(R_AbilityRangeNum * 0.1f, R_AbilityRangeNum * 0.1f);
         #endregion
     }
 
@@ -132,11 +165,11 @@ public class NewAbilityTracker : MonoBehaviour
         Q_Ability();
         W_Ability();
         E_Ability();
-        R_Ability();
+        //R_Ability();
 
         // Made this for targeted ability casting once in range
-        if (currentAbility != null && currentAbility.typeOfAbilityCast == AbilityClass.TypeOfAbilityCast.Targeted)
-            CastAbilityOnceInRange(currentAbility, currentAbility.abilityRangeNum);
+        //if (currentAbility != null && currentAbility.typeOfAbilityCast == AbilityClass.TypeOfAbilityCast.Targeted)
+            //CastAbilityOnceInRange(currentAbility, currentAbility.abilityRangeNum);
 
         // Canvas Control for abilities
         RaycastHit hit;
@@ -145,7 +178,7 @@ public class NewAbilityTracker : MonoBehaviour
         #region Case By Case Hero Init
 
         // Ability 1 Inputs - Cube
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity))
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, terrainMask))
         {
             position = new Vector3(hit.point.x, hit.point.y, hit.point.z);
         }
@@ -154,37 +187,34 @@ public class NewAbilityTracker : MonoBehaviour
         /// Skillshot ability indicator rotation code
         Quaternion transRot = Quaternion.LookRotation(position - playerTransform.transform.position);
         transRot.eulerAngles = new Vector3(0, transRot.eulerAngles.y, 0);
-        Q_Ability_Canvas.transform.rotation = Quaternion.Lerp(transRot, Q_Ability_Canvas.transform.rotation, 0f);
+        Q_Ability_Parent_GameObject.transform.rotation = Quaternion.Lerp(transRot, Q_Ability_Parent_GameObject.transform.rotation, 0f);
 
         // Ability 2 Inputs - Cube
-        if (currentAbility != null)
+        if (currentAbility == heroClass.W_Ability)
         {
-            if (currentAbility.abilityKeyCode == W_Ability_Keycode)
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, terrainMask))
             {
-                if (Physics.Raycast(ray, out hit, Mathf.Infinity, terrainMask))
+                if (hit.collider.gameObject != this.gameObject)
                 {
-                    if (hit.collider.gameObject != this.gameObject)
-                    {
-                        posUp = new Vector3(hit.point.x, 10f, hit.point.z);
-                        position = hit.point;
-                    }
+                    posUp = new Vector3(hit.point.x, hit.point.y, hit.point.z);
+                    position = hit.point;
                 }
+            }
 
-                // Ability 2 Canvas Inputs - Cube
-                /// AOE Ability Range indicator code
-                var hitPosDir = (hit.point - transform.position).normalized;
-                float distance = Vector3.Distance(hit.point, transform.position);
-                distance = Mathf.Min(distance, AOESkillshot_MaxAbility_Distance);
+            // Ability 2 Canvas Inputs - Cube
+            /// AOE Ability Range indicator code
+            var hitPosDir = (hit.point - transform.position).normalized;
+            float distance = Vector3.Distance(hit.point, transform.position);
+            distance = Mathf.Min(distance, AOESkillshot_MaxAbility_Distance);
 
-                var newHitPos = transform.position + hitPosDir * distance;
-                W_Ability_Canvas.transform.position = (newHitPos);
+            var newHitPos = transform.position + hitPosDir * distance;
+            W_Ability_Indicator_GameObject.transform.position = new Vector3(newHitPos.x, newHitPos.y + 1.1f, newHitPos.z);
 
-                // This is a situational adjustment to the W indicator clipping through higher terrain / may be obsolete in the future
-                if (currentAbility.abilityKeyCode == KeyCode.W)
-                {
-                    //W_Pic = W_Ability_Canvas.GetComponent<RectTransform>();
-                    //W_Pic.anchoredPosition3D = new Vector3(W_Pic.anchoredPosition3D.x, W_Pic.anchoredPosition3D.y + 2, W_Pic.anchoredPosition3D.z);
-                }
+            // This is a situational adjustment to the W indicator clipping through higher terrain / may be obsolete in the future
+            if (currentAbility.abilityKeyCode == KeyCode.W)
+            {
+            //W_Pic = W_Ability_Canvas.GetComponent<RectTransform>();
+            //W_Pic.anchoredPosition3D = new Vector3(W_Pic.anchoredPosition3D.x, W_Pic.anchoredPosition3D.y + 2, W_Pic.anchoredPosition3D.z);
             }
         }
 
@@ -195,10 +225,18 @@ public class NewAbilityTracker : MonoBehaviour
     {
         yield return new WaitForSeconds(time);
 
-        if (StatName == "Speed")
-        {
+        switch (StatName) {
+
+            case "Speed":
             moveScript.agent.speed = StatDefaultValue;
+            E_VFX_ParticleSystem.Stop();
             Debug.Log("Coroutine Executed!");
+                break;
+
+            case "Attack Speed":
+            heroClass.heroAttackSpeed = StatDefaultValue;
+                break;
+
         }
     }
 
@@ -221,13 +259,14 @@ public class NewAbilityTracker : MonoBehaviour
         _temp.GetComponent<ProjectileScript>().projTargeted = _targeted;
     }
 
+    /*
     void CastAbilityOnceInRange(AbilityClass _currentAbility, float _range) // TODO - make it so that it is more universal
     {
         if (R_Ability_MoveThenInRange && heroCombat.targetedEnemy != null)
         {
             if (Vector3.Distance(gameObject.transform.position, heroCombat.targetedEnemy.transform.position) < _range)
             {
-                Debug.Log("In range!!!!");
+                //Debug.Log("In range!!!!");
 
                 // Check Mana, then Cast Ability
                 if (heroClass.heroMana >= heroClass.R_Ability.abilityCost)
@@ -265,7 +304,7 @@ public class NewAbilityTracker : MonoBehaviour
             }
         }
     }
-
+    */
 
     #region Case by Case Ability Function Calls
 
@@ -278,53 +317,70 @@ public class NewAbilityTracker : MonoBehaviour
         // Prep or cancel ability indicators
         if (Input.GetKeyDown(Q_Ability_Keycode) && heroClass.Q_Ability.isCooldown == false)
         {
-            if (Q_Ability_Indicator.enabled == false)
-            {
-                currentAbility = heroClass.Q_Ability;
-                Debug.Log("Q ability was prepped.");
-                Q_Ability_Indicator.enabled = true;
-                Q_Ability_Range.enabled = true;
+            // If enough mana before showing indictors // TODO - Quick Cast check
+            if (heroClass.Q_Ability.abilityCost <= heroClass.heroMana)
+            { // If ability isn't prepped already
+                if (currentAbility != heroClass.Q_Ability)
+                {
+                    currentAbility = heroClass.Q_Ability;
+                    Debug.Log("Q ability was prepped.");
 
-                W_Ability_Indicator.enabled = false;
-                W_Ability_Range.enabled = false;
+                    Q_Ability_Indicator_SpriteRenderer.sprite = Q_Ability_Indicator_Sprite;
+                    Q_Ability_Range_SpriteRenderer.sprite = Q_Ability_Range_Sprite;
 
-                E_Ability_Indicator.enabled = false;
-                E_Ability_Range.enabled = false;
+                    W_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+                    W_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
 
-                R_Ability_Indicator.enabled = false;
-                R_Ability_Range.enabled = false;
-            }
-            else
+                    E_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+                    E_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
+
+                    //R_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+                    //R_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
+                } // If ability was already prepped
+                else if (currentAbility == heroClass.Q_Ability)
+                {
+                    currentAbility = null;
+                    Q_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+                    Q_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
+                    Debug.Log("Q ability was canceled!");
+                }
+            } // If not enough mana to cast
+            else if (heroClass.Q_Ability.abilityCost > heroClass.heroMana)
             {
                 currentAbility = null;
-                Debug.Log("Q ability was canceled.");
-                Q_Ability_Indicator.enabled = false;
-                Q_Ability_Range.enabled = false;
+                systemScript.AlertObservers("Not enough Mana!");
             }
-        }
+        } // If ability is on cooldown
         else if (Input.GetKeyDown(Q_Ability_Keycode) && heroClass.Q_Ability.isCooldown == true)
         {
+            currentAbility = null;
             Debug.Log("Q Ability is on Cooldown!");
+            systemScript.AlertObservers("Ability is on cooldown!");
         }
 
         // Use ability?
-        if (Q_Ability_Indicator.enabled == true && Input.GetMouseButtonDown(0) && currentAbility.abilityKeyCode == Q_Ability_Keycode)
+        if (Input.GetMouseButtonDown(0) && currentAbility == heroClass.Q_Ability)
         {
             // Check Mana, then Cast Ability
             if (heroClass.heroMana >= heroClass.Q_Ability.abilityCost)
             {
                 // FIXME // before instantiation, create a Cast Time buffer and UI element
-                moveScript.JustStopMovement(true);
                 Vector3 relativePos = Q_Ability_TargetTransform.position - transform.position;
 
                 // the second argument, upwards, defaults to Vector3.up
                 Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
                 transform.rotation = rotation;
-
                 //transform.LookAt(Q_Ability_TargetTransform.position + transform.forward);
+
+                // TODO - Check if can cast while moving, check if has cast time, check if auto reset
+                moveScript.JustStopMovement(true);
+                heroCombat.CallAbilityCast(0.5f);
+                heroCombat.ResetAutoAttack(false);
+
                 CreateAbility(heroClass.Q_Ability, Q_Projectile, Q_Ability_Spawn.transform.position, null, relativePos, false);
                 heroClass.heroMana -= heroClass.Q_Ability.abilityCost;
 
+                currentAbility = null;
                 Debug.Log("Used Q Ability!");
                 heroClass.Q_Ability.isCooldown = true;
                 heroClass.Q_Ability.HUDIcon.fillAmount = 1;
@@ -336,8 +392,8 @@ public class NewAbilityTracker : MonoBehaviour
 
                 currentAbility = null;
                 Debug.Log("Q ability was canceled.");
-                Q_Ability_Indicator.enabled = false;
-                Q_Ability_Range.enabled = false;
+                Q_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+                Q_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
             }
 
         }
@@ -346,8 +402,8 @@ public class NewAbilityTracker : MonoBehaviour
         if (heroClass.Q_Ability.isCooldown)
         {
             heroClass.Q_Ability.HUDIcon.fillAmount -= 1 / heroClass.Q_Ability.abilityCooldown * Time.deltaTime;
-            Q_Ability_Indicator.enabled = false;
-            Q_Ability_Range.enabled = false;
+            Q_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+            Q_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
 
             if (heroClass.Q_Ability.HUDIcon.fillAmount <= 0)
             {
@@ -362,46 +418,66 @@ public class NewAbilityTracker : MonoBehaviour
         // Prep or cancel ability indicators
         if (Input.GetKeyDown(W_Ability_Keycode) && heroClass.W_Ability.isCooldown == false)
         {
-            if (W_Ability_Indicator.enabled == false)
-            {
-                currentAbility = heroClass.W_Ability;
-                Debug.Log("W ability was prepped.");
-                Q_Ability_Indicator.enabled = false;
-                Q_Ability_Range.enabled = false;
+            // If enough mana before showing indictors // TODO - Quick Cast check
+            if (heroClass.W_Ability.abilityCost <= heroClass.heroMana)
+            { // If ability isn't prepped already
+                if (currentAbility != heroClass.W_Ability)
+                {
+                    currentAbility = heroClass.W_Ability;
+                    Debug.Log("W ability was prepped.");
 
-                W_Ability_Indicator.enabled = true;
-                W_Ability_Range.enabled = true;
+                    Q_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+                    Q_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
 
-                E_Ability_Indicator.enabled = false;
-                E_Ability_Range.enabled = false;
+                    W_Ability_Indicator_SpriteRenderer.sprite = W_Ability_Indicator_Sprite;
+                    W_Ability_Range_SpriteRenderer.sprite = W_Ability_Range_Sprite;
 
-                R_Ability_Indicator.enabled = false;
-                R_Ability_Range.enabled = false;
-            }
-            else
+                    E_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+                    E_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
+
+                    //R_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+                    //R_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
+                } // If ability was already prepped
+                else if (currentAbility == heroClass.W_Ability)
+                {
+                    currentAbility = null;
+                    W_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+                    W_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
+                    Debug.Log("W ability was canceled!");
+                }
+            } // If not enough mana to cast
+            else if (heroClass.W_Ability.abilityCost > heroClass.heroMana)
             {
                 currentAbility = null;
-                Debug.Log("W ability was canceled.");
-                W_Ability_Indicator.enabled = false;
-                W_Ability_Range.enabled = false;
+                systemScript.AlertObservers("Not enough Mana!");
             }
-        }
+        } // If ability is on cooldown
         else if (Input.GetKeyDown(W_Ability_Keycode) && heroClass.W_Ability.isCooldown == true)
         {
+            currentAbility = null;
             Debug.Log("W Ability is on Cooldown!");
+            systemScript.AlertObservers("Ability is on cooldown!");
         }
 
         // Use ability?
-        if (W_Ability_Indicator.enabled == true && Input.GetMouseButton(0) && currentAbility.abilityKeyCode == W_Ability_Keycode)
+        if (Input.GetMouseButtonDown(0) && currentAbility == heroClass.W_Ability)
         {
-            // FIXME // before instantiation, create a Cast Time buffer and UI element
-
             // Check Mana, then Cast Ability
             if (heroClass.heroMana >= heroClass.W_Ability.abilityCost)
             {
+                // FIXME // before instantiation, create a Cast Time buffer and UI element
+                //moveScript.JustStopMovement(true);
+                //Vector3 relativePos = Q_Ability_TargetTransform.position - transform.position;
+
+                // the second argument, upwards, defaults to Vector3.up
+                //Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
+                //transform.rotation = rotation;
+
+                //transform.LookAt(Q_Ability_TargetTransform.position + transform.forward);
                 CreateAbility(heroClass.W_Ability, W_Projectile, W_Ability_Spawn.transform.position, null, Vector3.zero, false);
                 heroClass.heroMana -= heroClass.W_Ability.abilityCost;
 
+                currentAbility = null;
                 Debug.Log("Used W Ability!");
                 heroClass.W_Ability.isCooldown = true;
                 heroClass.W_Ability.HUDIcon.fillAmount = 1;
@@ -413,17 +489,18 @@ public class NewAbilityTracker : MonoBehaviour
 
                 currentAbility = null;
                 Debug.Log("W ability was canceled.");
-                W_Ability_Indicator.enabled = false;
-                W_Ability_Range.enabled = false;
+                W_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+                W_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
             }
+
         }
 
         // Keep track of CD and Hud Icon
         if (heroClass.W_Ability.isCooldown)
         {
             heroClass.W_Ability.HUDIcon.fillAmount -= 1 / heroClass.W_Ability.abilityCooldown * Time.deltaTime;
-            W_Ability_Indicator.enabled = false;
-            W_Ability_Range.enabled = false;
+            W_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+            W_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
 
             if (heroClass.W_Ability.HUDIcon.fillAmount <= 0)
             {
@@ -438,74 +515,102 @@ public class NewAbilityTracker : MonoBehaviour
         // Prep or cancel ability indicators
         if (Input.GetKeyDown(E_Ability_Keycode) && heroClass.E_Ability.isCooldown == false)
         {
-            if (E_Ability_Indicator.enabled == false)
-            {
-                currentAbility = heroClass.E_Ability;
-                Debug.Log("E ability was prepped.");
-                Q_Ability_Indicator.enabled = false;
-                Q_Ability_Range.enabled = false;
+            // If enough mana before showing indictors // TODO - Quick Cast check
+            if (heroClass.E_Ability.abilityCost <= heroClass.heroMana)
+            { // If ability isn't prepped already
+                if (currentAbility != heroClass.E_Ability)
+                {
+                    currentAbility = heroClass.E_Ability;
+                    Debug.Log("E ability was prepped.");
 
-                W_Ability_Indicator.enabled = false;
-                W_Ability_Range.enabled = false;
+                    Q_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+                    Q_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
 
-                E_Ability_Indicator.enabled = true;
-                E_Ability_Range.enabled = true;
+                    W_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+                    W_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
 
-                R_Ability_Indicator.enabled = false;
-                R_Ability_Range.enabled = false;
-            }
-            else
+                    E_Ability_Indicator_SpriteRenderer.sprite = E_Ability_Indicator_Sprite;
+                    E_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
+
+                    //R_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+                    //R_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
+                } // If ability was already prepped
+                else if (currentAbility == heroClass.E_Ability)
+                {
+                    currentAbility = null;
+                    E_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+                    E_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
+                    Debug.Log("E ability was canceled!");
+                }
+            } // If not enough mana to cast
+            else if (heroClass.E_Ability.abilityCost > heroClass.heroMana)
             {
                 currentAbility = null;
-                Debug.Log("E ability was canceled.");
-                E_Ability_Indicator.enabled = false;
-                E_Ability_Range.enabled = false;
+                systemScript.AlertObservers("Not enough Mana!");
             }
-        }
+        } // If ability is on cooldown
         else if (Input.GetKeyDown(E_Ability_Keycode) && heroClass.E_Ability.isCooldown == true)
         {
+            currentAbility = null;
             Debug.Log("E Ability is on Cooldown!");
+            systemScript.AlertObservers("Ability is on cooldown!");
         }
 
         // Use ability?
-        if (E_Ability_Indicator.enabled == true && Input.GetMouseButton(0) && currentAbility.abilityKeyCode == E_Ability_Keycode)
+        if (Input.GetMouseButtonDown(0) && currentAbility == heroClass.E_Ability)
         {
-            float startHeroSpeed = moveScript.agent.speed;
-
-            // Check Mana, then Cast
+            // Check Mana, then Cast Ability
             if (heroClass.heroMana >= heroClass.E_Ability.abilityCost)
             {
+                // FIXME // before instantiation, create a Cast Time buffer and UI element
+                //moveScript.JustStopMovement(true);
+                //Vector3 relativePos = Q_Ability_TargetTransform.position - transform.position;
+
+                // the second argument, upwards, defaults to Vector3.up
+                //Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
+                //transform.rotation = rotation;
+
+                //transform.LookAt(Q_Ability_TargetTransform.position + transform.forward);
+
                 /// Cast Buff
+                startHeroSpeed = heroClass.heroSpeed;
                 moveScript.agent.speed += moveScript.agent.speed * heroClass.E_Ability.abilityBuffPercentage;
+                StartCoroutine(ResetStatValue("Speed", moveScript.agent.speed, startHeroSpeed, heroClass.E_Ability.abilityDuration));
+
+                float startHeroAttackSpeed = heroClass.heroAttackSpeed;
+                heroClass.heroAttackSpeed += heroClass.heroAttackSpeed * (heroClass.E_Ability.abilityBuffPercentage);
+                StartCoroutine(ResetStatValue("Attack Speed", heroClass.heroAttackSpeed, startHeroAttackSpeed, heroClass.E_Ability.abilityDuration));
+
+                heroCombat.ResetAutoAttack(true);
+
+                E_VFX_ParticleSystem.Play();
+                Debug.Log("Coroutine Called!");
                 heroClass.heroMana -= heroClass.E_Ability.abilityCost;
 
+                currentAbility = null;
                 Debug.Log("Used E Ability!");
                 heroClass.E_Ability.isCooldown = true;
                 heroClass.E_Ability.HUDIcon.fillAmount = 1;
             }
             else
             {
+                Debug.Log("Not enough mana!");
                 systemScript.AlertObservers("Not enough Mana!");
+
                 currentAbility = null;
-
                 Debug.Log("E ability was canceled.");
-                E_Ability_Indicator.enabled = false;
-                E_Ability_Range.enabled = false;
+                E_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+                E_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
             }
 
-            if (heroClass.E_Ability.isCooldown)
-            {
-                StartCoroutine(ResetStatValue("Speed", moveScript.agent.speed, startHeroSpeed, heroClass.E_Ability.abilityDuration));
-                Debug.Log("Coroutine Called!");
-            }
         }
 
         // Keep track of CD and Hud Icon
         if (heroClass.E_Ability.isCooldown)
         {
             heroClass.E_Ability.HUDIcon.fillAmount -= 1 / heroClass.E_Ability.abilityCooldown * Time.deltaTime;
-            E_Ability_Indicator.enabled = false;
-            E_Ability_Range.enabled = false;
+            E_Ability_Indicator_SpriteRenderer.sprite = NoVisual_Sprite;
+            E_Ability_Range_SpriteRenderer.sprite = NoVisual_Sprite;
 
             if (heroClass.E_Ability.HUDIcon.fillAmount <= 0)
             {
@@ -514,7 +619,7 @@ public class NewAbilityTracker : MonoBehaviour
             }
         }
     }
-
+    /*
     void R_Ability()
     {
         // Prep or cancel ability indicators
@@ -527,7 +632,7 @@ public class NewAbilityTracker : MonoBehaviour
                 Q_Ability_Indicator.enabled = false;
                 Q_Ability_Range.enabled = false;
 
-                W_Ability_Indicator.enabled = false;
+                W_Ability_Indicator_Image.enabled = false;
                 W_Ability_Range.enabled = false;
 
                 E_Ability_Indicator.enabled = false;
@@ -547,6 +652,7 @@ public class NewAbilityTracker : MonoBehaviour
         else if (Input.GetKeyDown(R_Ability_Keycode) && heroClass.R_Ability.isCooldown == true)
         {
             Debug.Log("R Ability is on Cooldown!");
+            systemScript.AlertObservers("Ability is on cooldown!");
         }
 
         // Use ability?
@@ -559,14 +665,14 @@ public class NewAbilityTracker : MonoBehaviour
                     moveScript.agent.SetDestination(heroCombat.targetedEnemy.transform.position);
                     moveScript.agent.stoppingDistance = R_AbilityRangeNum;
 
-                    Debug.Log("Out of range!!!!");
+                    //Debug.Log("Out of range!!!!");
 
                     R_Ability_MoveThenInRange = true;
                 }
             }
             else if (Vector3.Distance(gameObject.transform.position, heroCombat.targetedEnemy.transform.position) < R_AbilityRangeNum)
             {
-                Debug.Log("In range!!!!");
+                //Debug.Log("In range!!!!");
 
                 // Check Mana, then Cast Ability
                 if (heroClass.heroMana >= heroClass.R_Ability.abilityCost)
@@ -616,16 +722,16 @@ public class NewAbilityTracker : MonoBehaviour
             }
         }
     }
-
+    */
     #endregion
-    
+
     //private void OnDrawGizmosSelected()
     //{
-        //Gizmos.color = Color.red;
-        //Gizmos.DrawWireSphere(transform.position, heroClass.R_Ability.abilityRangeNum);
+    //Gizmos.color = Color.red;
+    //Gizmos.DrawWireSphere(transform.position, heroClass.R_Ability.abilityRangeNum);
 
-        //Gizmos.color = Color.blue;
-        //Gizmos.DrawWireSphere(transform.position, heroClass.R_Ability.abilityRangeNum);
+    //Gizmos.color = Color.blue;
+    //Gizmos.DrawWireSphere(transform.position, heroClass.R_Ability.abilityRangeNum);
     //}
-    
+
 }

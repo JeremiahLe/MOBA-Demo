@@ -24,7 +24,7 @@ public class AbilityTracker : MonoBehaviour
 
     // Ability 1 Input Variables
     Vector3 position;
-    //[SerializeField] private Canvas Q_Ability_Canvas;
+    //[SerializeField] private Canvas Q_Ability_Indicator_GameObject;
     //[SerializeField] private Image Q_Skillshot;
 
     [Header("W Ability")]
@@ -149,7 +149,7 @@ public class AbilityTracker : MonoBehaviour
         /// Skillshot ability indicator rotation code
         //Quaternion transRot = Quaternion.LookRotation(position - player.transform.position);
         //transRot.eulerAngles = new Vector3(0, transRot.eulerAngles.y, 0);
-        //Q_Ability_Canvas.transform.rotation = Quaternion.Lerp(transRot, Q_Ability_Canvas.transform.rotation, 0f);
+        //Q_Ability_Indicator_GameObject.transform.rotation = Quaternion.Lerp(transRot, Q_Ability_Indicator_GameObject.transform.rotation, 0f);
 
         /// Ability 2 Canvas Inputs
         /// AOE Ability Range indicator code

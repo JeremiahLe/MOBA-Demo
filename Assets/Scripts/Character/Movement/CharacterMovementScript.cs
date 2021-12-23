@@ -75,23 +75,17 @@ public class CharacterMovementScript : MonoBehaviour
     // Adjusting player NavAgent rotation
     private void LateUpdate()
     {
-        if (agent.velocity.sqrMagnitude > Mathf.Epsilon)
+        if (agent.velocity.sqrMagnitude > Mathf.Epsilon && heroCombatScript.notCasting)
         {
-            transform.localRotation = Quaternion.LookRotation(new Vector3(agent.velocity.normalized.x, 90, agent.velocity.normalized.z));
+            transform.localRotation = Quaternion.LookRotation(new Vector3(agent.velocity.normalized.x, 0, agent.velocity.normalized.z));
             prevX = agent.velocity.normalized.x;
             prevZ = agent.velocity.normalized.z;
-        }
-        else if (abilityCasting != true)
-           transform.localRotation = Quaternion.LookRotation(new Vector3(prevX, 90, prevZ));
-        else if (abilityCasting == true)
-        {
-            //transform.localRotation = Quaternion.LookRotation(Vector3.forward, Vector3.up);
         }
     }
 
     IEnumerator ResetStopMovement()
     {
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.2f);
         agent.isStopped = false;
         abilityCasting = false;
     }
@@ -106,7 +100,7 @@ public class CharacterMovementScript : MonoBehaviour
 
     public void JustStopMovement(bool _abilityCasting)
     {
-        heroCombatScript.targetedEnemy = null;
+        //heroCombatScript.targetedEnemy = null;
         agent.isStopped = true;
         agent.SetDestination(transform.position);
         abilityCasting = _abilityCasting;

@@ -46,6 +46,11 @@ public class InputTargeting : MonoBehaviour
                 {
                     if (hit.collider.gameObject.GetComponent<TargetableScript>().enemyType == TargetableScript.EnemyType.Minion)
                     {
+                        if (hit.collider.gameObject != selectedHero.GetComponent<HeroCombat>().targetedEnemy && selectedHero.GetComponent<HeroCombat>().targetedEnemy != null)
+                        {
+                            selectedHero.GetComponent<HeroCombat>().ResetAutoAttack(false); // fix auto infinite range  ?
+                        }
+
                         selectedHero.GetComponent<HeroCombat>().targetedEnemy = hit.collider.gameObject;
                         selectedHero.GetComponent<HeroCombat>().moveToEnemy = true;
 
@@ -95,7 +100,7 @@ public class InputTargeting : MonoBehaviour
                     {
                         if (hit.collider.gameObject != selectedHero.GetComponent<HeroCombat>().targetedEnemy)
                         {
-                            selectedHero.GetComponent<HeroCombat>().ResetAutoAttack(); // fix auto infinite range  ?
+                            selectedHero.GetComponent<HeroCombat>().ResetAutoAttack(false); // fix auto infinite range  ?
                         }
 
                         selectedHero.GetComponent<HeroCombat>().targetedEnemy = hit.collider.gameObject;
