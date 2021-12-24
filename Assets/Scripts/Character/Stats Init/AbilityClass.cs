@@ -30,6 +30,10 @@ public class AbilityClass
     public float abilityCastTime;
 
     public float abilityBaseDamage;
+    public string abilityDescription;
+    public string abilityPerLevel;
+
+    public float abilityScaling;
 
     public bool isCooldown;
 

@@ -113,7 +113,7 @@ public class HeroClass : MonoBehaviour
         heroCooldownReduction = 0.0f;
     }
 
-    void Start()
+    void Awake()
     {
         GetPlayerHotkeys();
         HeroName = heroAssigner.ToString();
@@ -142,7 +142,7 @@ public class HeroClass : MonoBehaviour
         switch (heroAssigner)
         {
             case HeroAssigner.Ekard:
-                Hero_Cube_Ability_Init();
+                Hero_Ekard_Ability_Init();
                 Debug.Log("Assigned Hero is " + HeroName);
                 break;
 
@@ -173,12 +173,40 @@ public class HeroClass : MonoBehaviour
         }
     }
 
-    // Hero inits 
+    // Hero inits
 
-    void Hero_Cube_Ability_Init()
+    public void GetUpdatedStats(AbilityClass _ability)
+    {
+        if (_ability == Q_Ability)
+        {
+            Q_Ability.abilityDescription = Q_Ability.abilityDescription = string.Format(
+                "{0} casts a medium range fireball in a line, dealing {1} (+{2}) ability damage to the first enemy hit.", HeroName, Q_Ability.abilityBaseDamage, heroAbilityDmg);
+        }
+        else if (_ability == W_Ability)
+        {
+            W_Ability.abilityDescription = string.Format(
+                "{0} creates an explosion of light at a target location, dealing {1} (+{2}) AOE ability damage. Can be cast while moving.", HeroName, W_Ability.abilityBaseDamage, heroAbilityDmg);
+        }
+        else if (_ability == E_Ability)
+        {
+            E_Ability.abilityDescription = string.Format(
+                "{0} makes haste, gaining a burst of ({1}%) movement speed and attack speed for ({2}) seconds. Acts as an auto-attack reset.", HeroName, E_Ability.abilityBuffPercentage * 100, E_Ability.abilityDuration);
+        }
+        else if (_ability == R_Ability)
+        {
+            R_Ability.abilityDescription = string.Format(
+                "{0} conjures a massive fire bomb at an enemy, dealing {1} (+{2}) ability damage. ", HeroName, R_Ability.abilityBaseDamage, heroAbilityDmg);
+        }
+        else
+        {
+            Debug.Log("Missing ability reference", this);
+        }
+    }
+
+    void Hero_Ekard_Ability_Init()
     {
         ///
-        /// Hero - Cube Stat Init
+        /// Hero - Ekard Stat Init
         /// 
 
         heroLevel = 1;
@@ -223,7 +251,7 @@ public class HeroClass : MonoBehaviour
         Q_Ability.typeOfAbilityCC = AbilityClass.TypeOfAbilityCC.None;
         Q_Ability.typeOfAbilityDamage = AbilityClass.TypeOfAbilityDamage.AbilityDamage;
 
-        Q_Ability.abilityName = "Cube Shot";
+        Q_Ability.abilityName = "Fireball";
         Q_Ability.abilityCooldown = 2.5f;
         Q_Ability.HUDIcon = Q_HudIcon;
         Q_Ability.Indicator = Q_Indicator;
@@ -239,8 +267,11 @@ public class HeroClass : MonoBehaviour
         Q_Ability.abilityCastTime = 0f;
 
         Q_Ability.abilityBaseDamage = 60f;
+        Q_Ability.abilityScaling = 1;
 
         Q_Ability.abilityCost = 15f;
+        Q_Ability.abilityDescription = string.Format("{0} casts a medium range fireball in a line, dealing {1} (+{2}) ability damage to the first enemy hit.", HeroName, Q_Ability.abilityBaseDamage, heroAbilityDmg);
+        Q_Ability.abilityPerLevel = string.Format("Damage: 60 / 80 / 110 / 130 / 150\nCost: 15 / 20 / 25 / 30 / 30");
 
         // may change this
         //Q_Ability.abilitySprite = Resources.Load<Sprite>("ProjectilePrefabSprites/Fireball_Sprite");
@@ -250,7 +281,7 @@ public class HeroClass : MonoBehaviour
         ///
 
         /// Ability Summary:
-        /// Cast a short range bomb at a target location within a certain range, dealing aoe damage.
+        /// Cast a short range explosion of light at a target location within a certain range, dealing aoe damage.
         /// 
 
         W_Ability = new AbilityClass();
@@ -258,8 +289,8 @@ public class HeroClass : MonoBehaviour
         W_Ability.typeOfAbilityCC = AbilityClass.TypeOfAbilityCC.None;
         W_Ability.typeOfAbilityDamage = AbilityClass.TypeOfAbilityDamage.AbilityDamage;
 
-        W_Ability.abilityName = "Cube Bomb";
-        W_Ability.abilityCooldown = 6f;
+        W_Ability.abilityName = "Light Explosion";
+        W_Ability.abilityCooldown = 9f;
         W_Ability.HUDIcon = W_HudIcon;
         W_Ability.Indicator = W_Indicator;
         W_Ability.Range = W_Range;
@@ -274,8 +305,11 @@ public class HeroClass : MonoBehaviour
         W_Ability.abilityCastTime = 0f;
 
         W_Ability.abilityBaseDamage = 90f;
+        Q_Ability.abilityScaling = .3f;
 
         W_Ability.abilityCost = 45f;
+        W_Ability.abilityDescription = string.Format("{0} creates an explosion of light at a target location, dealing {1} (+{2}) AOE ability damage. Can be cast while moving.", HeroName, W_Ability.abilityBaseDamage, heroAbilityDmg);
+        W_Ability.abilityPerLevel = string.Format("Damage: 90 / 110 / 130 / 140 / 150\nCost: 45 / 50 / 55 / 60 / 60\nCooldown: 9 / 8.75 / 8.25 / 7.75 / 6");
 
         ///
         /// E Abililty Init
@@ -290,7 +324,7 @@ public class HeroClass : MonoBehaviour
         E_Ability.typeOfAbilityCC = AbilityClass.TypeOfAbilityCC.None;
         E_Ability.typeOfAbilityDamage = AbilityClass.TypeOfAbilityDamage.NoDamage;
 
-        E_Ability.abilityName = "Cube Rush";
+        E_Ability.abilityName = "Haste";
         E_Ability.abilityCooldown = 11f;
         E_Ability.HUDIcon = E_HudIcon;
         E_Ability.Indicator = E_Indicator;
@@ -305,13 +339,15 @@ public class HeroClass : MonoBehaviour
         E_Ability.abilityBaseDamage = 0f; // it doesn't do damage
 
         E_Ability.abilityCost = 60f;
+        E_Ability.abilityDescription = string.Format("{0} makes haste, gaining a burst of {1}% movement speed and attack speed for {2} seconds. Acts as an auto-attack reset.", HeroName, E_Ability.abilityBuffPercentage * 100, E_Ability.abilityDuration);
+        E_Ability.abilityPerLevel = string.Format("Movement Speed & Attack Speed %: 45 / 50 / 55 / 60 / 60\nDuration: 2 / 2.2 / 2.6 / 2.8 / 3");
 
         ///
         /// R Abililty Init
         ///
 
         /// Ability Summary:
-        /// Cast a targeted missile at an enemy.
+        /// Cast a targeted fire bomb at an enemy.
         /// 
 
         R_Ability = new AbilityClass();
@@ -319,8 +355,8 @@ public class HeroClass : MonoBehaviour
         R_Ability.typeOfAbilityCC = AbilityClass.TypeOfAbilityCC.Slow;
         R_Ability.typeOfAbilityDamage = AbilityClass.TypeOfAbilityDamage.AbilityDamage;
 
-        R_Ability.abilityName = "Cube Missile";
-        R_Ability.abilityCooldown = 35f;
+        R_Ability.abilityName = "Fire Bomb";
+        R_Ability.abilityCooldown = 55f;
         R_Ability.HUDIcon = R_HudIcon;
         R_Ability.Indicator = R_Indicator;
         R_Ability.Range = R_Range;
@@ -335,7 +371,10 @@ public class HeroClass : MonoBehaviour
         R_Ability.abilityCastTime = 0f;
 
         R_Ability.abilityBaseDamage = 150f;
+        Q_Ability.abilityScaling = .75f;
 
         R_Ability.abilityCost = 100f;
+        R_Ability.abilityDescription = string.Format("{0} conjures a massive fire bomb at an enemy, dealing {1} (+{2}) ability damage. ", HeroName, R_Ability.abilityBaseDamage, heroAbilityDmg);
+        R_Ability.abilityPerLevel = string.Format("Damage: 150 / 195 / 245\nCooldown: 55 / 45 / 35");
     }
 }
