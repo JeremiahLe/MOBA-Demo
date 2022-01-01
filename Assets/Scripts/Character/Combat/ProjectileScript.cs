@@ -15,6 +15,7 @@ public class ProjectileScript : MonoBehaviour
 
     public float projSpeed;
     public float projDamage;
+    public float projDamageScaling;
     public float projRange;
 
     public bool projTargeted;
@@ -38,6 +39,8 @@ public class ProjectileScript : MonoBehaviour
 
     GameControl_Script gsScript;
 
+    HeroClass heroClass;
+
     public GameObject DamageTextPopup_object;
     
     // Start is called before the first frame update
@@ -46,6 +49,8 @@ public class ProjectileScript : MonoBehaviour
         sr = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
+
+        heroClass = projCreator.GetComponent<HeroClass>();
 
         projAbilityType = (ProjAbilityType)System.Enum.Parse(typeof(ProjAbilityType), projAbilityTypeString);
 
@@ -211,11 +216,11 @@ public class ProjectileScript : MonoBehaviour
         }
     }
 
-    public void DealDamage(EnemyStatsScript enemyStats)
+    public void DealDamage(EnemyStatsScript enemyStats) // TODO - Switch damagetype and defense type based on damage type - attack, ability, true (ignore def & res)
     {
         if (hitObject == false)
         {
-            float damageCalc = projDamage - (enemyStats.enemyRes * 0.1f);
+            float damageCalc = projDamage + (heroClass.heroAbilityDmg * projDamageScaling) - (enemyStats.enemyRes * 0.1f);
             damageCalc = Mathf.Round(damageCalc);
 
             DamageTextPopup_object = Resources.Load<GameObject>("Prefabs/DamagePopup_UI");

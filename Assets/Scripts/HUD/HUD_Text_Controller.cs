@@ -5,7 +5,7 @@ using TMPro;
 
 public class HUD_Text_Controller : MonoBehaviour
 {
-    public enum TypeOfStat {health, mana};
+    public enum TypeOfStat {health, mana, xp};
     public TypeOfStat typeOfStat;
 
     TextMeshProUGUI statText;
@@ -25,9 +25,19 @@ public class HUD_Text_Controller : MonoBehaviour
     {
         //heroClassScript.heroHealth = Mathf.Round(heroClassScript.heroHealth * 100f) / 100f;
 
-        if (this.typeOfStat == TypeOfStat.health)
-            statText.text = (heroClassScript.heroHealth + "/" + heroClassScript.heroMaxHealth);
-        else
-            statText.text = (heroClassScript.heroMana + "/" + heroClassScript.heroMaxMana);
+        switch (typeOfStat)
+        {
+            case TypeOfStat.health:
+                statText.text = (heroClassScript.heroHealth + "/" + heroClassScript.heroMaxHealth);
+                break;
+
+            case TypeOfStat.mana:
+                statText.text = (heroClassScript.heroMana + "/" + heroClassScript.heroMaxMana);
+                break;
+
+            case TypeOfStat.xp:
+                statText.text = (heroClassScript.heroExp + "/" + heroClassScript.heroExpToNext);
+                break;
+        }
     }
 }

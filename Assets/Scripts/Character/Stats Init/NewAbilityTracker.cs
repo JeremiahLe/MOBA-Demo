@@ -106,6 +106,8 @@ public class NewAbilityTracker : MonoBehaviour
     HeroClass heroClass;
     private CharacterMovementScript moveScript;
     HeroCombat heroCombat;
+    AbilityLevelHUDVisualController_Script abilityHUDVisual;
+    public int availableSkillpoints = 1;
     #endregion
 
     void Start()
@@ -113,8 +115,9 @@ public class NewAbilityTracker : MonoBehaviour
         // Get our hero class component, getting each ability etc.
         heroClass = GetComponent<HeroClass>();
         moveScript = GetComponent<CharacterMovementScript>();
-        heroCombat = gameObject.GetComponent<HeroCombat>();
+        heroCombat = GetComponent<HeroCombat>();
         systemScript = FindObjectOfType<SystemNotificationManager_Script>();
+        abilityHUDVisual = FindObjectOfType<AbilityLevelHUDVisualController_Script>();
 
         // Ability GetComponents
         Q_Ability_Indicator_SpriteRenderer = Q_Ability_Indicator_GameObject.GetComponent<SpriteRenderer>();
@@ -168,6 +171,8 @@ public class NewAbilityTracker : MonoBehaviour
         W_Ability();
         E_Ability();
         R_Ability();
+
+        CheckLearnAbility();
 
         // Made this for targeted ability casting once in range
         if (currentAbility != null && currentAbility.typeOfAbilityCast == AbilityClass.TypeOfAbilityCast.Targeted)
@@ -306,6 +311,130 @@ public class NewAbilityTracker : MonoBehaviour
         }
     }
 
+    void CheckLearnAbility()
+    {
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            // Q Ability
+            if (Input.GetKeyUp(Q_Ability_Keycode))
+            {
+                if (availableSkillpoints == 0)
+                {
+                    systemScript.AlertObservers("No available skill points!");
+                    return;
+                }
+
+                if (availableSkillpoints != 0 && heroClass.Q_Ability.abilityLevel == heroClass.Q_Ability.abilityMaxLevel)
+                {
+                    systemScript.AlertObservers("Ability is max level!");
+                    return;
+                }
+
+                if (heroClass.Q_Ability.abilityLevel == 0)
+                    heroClass.Q_Ability.HUDIcon.fillAmount = 0;
+
+                heroClass.Q_Ability.abilityLevel += 1;
+                int level = heroClass.Q_Ability.abilityLevel += 1;
+                availableSkillpoints -= 1;
+                abilityHUDVisual.LevelAbilityHUD("Q", 1);
+
+                if (availableSkillpoints == 0)
+                {
+                    systemScript.AlertObservers("No available skill points! (No Popup)");
+                    return;
+                }
+            }
+            else // W Ability
+            if (Input.GetKeyUp(W_Ability_Keycode))
+            {
+                if (availableSkillpoints == 0)
+                {
+                    systemScript.AlertObservers("No available skill points!");
+                    return;
+                }
+
+                if (availableSkillpoints != 0 && heroClass.W_Ability.abilityLevel == heroClass.W_Ability.abilityMaxLevel)
+                {
+                    systemScript.AlertObservers("Ability is max level!");
+                    return;
+                }
+
+                if (heroClass.W_Ability.abilityLevel == 0)
+                    heroClass.W_Ability.HUDIcon.fillAmount = 0;
+
+                heroClass.W_Ability.abilityLevel += 1;
+                int level = heroClass.W_Ability.abilityLevel += 1;
+                availableSkillpoints -= 1;
+                abilityHUDVisual.LevelAbilityHUD("W", 1);
+
+                if (availableSkillpoints == 0)
+                {
+                    systemScript.AlertObservers("No available skill points! (No Popup)");
+                    return;
+                }
+            }
+            else // E Ability
+            if (Input.GetKeyUp(E_Ability_Keycode))
+            {
+                if (availableSkillpoints == 0)
+                {
+                    systemScript.AlertObservers("No available skill points!");
+                    return;
+                }
+
+                if (availableSkillpoints != 0 && heroClass.E_Ability.abilityLevel == heroClass.E_Ability.abilityMaxLevel)
+                {
+                    systemScript.AlertObservers("Ability is max level!");
+                    return;
+                }
+
+                if (heroClass.E_Ability.abilityLevel == 0)
+                    heroClass.E_Ability.HUDIcon.fillAmount = 0;
+
+                heroClass.E_Ability.abilityLevel += 1;
+                int level = heroClass.E_Ability.abilityLevel += 1;
+                availableSkillpoints -= 1;
+                abilityHUDVisual.LevelAbilityHUD("E", 1);
+
+                if (availableSkillpoints == 0)
+                {
+                    systemScript.AlertObservers("No available skill points! (No Popup)");
+                    return;
+                }
+            }
+            else // R Ability
+            if (Input.GetKeyUp(R_Ability_Keycode))
+            {
+                if (availableSkillpoints == 0)
+                {
+                    systemScript.AlertObservers("No available skill points!");
+                    return;
+                }
+
+                if (availableSkillpoints != 0 && heroClass.R_Ability.abilityLevel == heroClass.R_Ability.abilityMaxLevel)
+                {
+                    systemScript.AlertObservers("Ability is max level!");
+                    return;
+                }
+
+                if (availableSkillpoints != 0 && heroClass.heroLevel >= 6 && heroClass.R_Ability.abilityLevel == 0) // TODO - SHOW AVAILABLE AT LEVEL 6 + POINT AND ONLY RANK 1 AT 6+, RANK 2 AT 11+ AND RANK 3 AT 16+
+                {
+                    heroClass.R_Ability.abilityLevel += 1;
+                    int level = heroClass.R_Ability.abilityLevel += 1;
+                    availableSkillpoints -= 1;
+                    abilityHUDVisual.LevelAbilityHUD("R", 1);
+                    heroClass.R_Ability.HUDIcon.fillAmount = 0;
+                }
+
+                if (availableSkillpoints == 0)
+                {
+                    systemScript.AlertObservers("No available skill points! (No Popup)");
+                    return;
+                }
+            }
+        }
+    }
+
     #region Case by Case Ability Function Calls
 
     /// <summary>
@@ -315,8 +444,16 @@ public class NewAbilityTracker : MonoBehaviour
     void Q_Ability()
     {
         // Prep or cancel ability indicators
-        if (Input.GetKeyDown(Q_Ability_Keycode) && heroClass.Q_Ability.isCooldown == false)
+        if (Input.GetKeyDown(Q_Ability_Keycode) && !Input.GetKey(KeyCode.LeftShift) && heroClass.Q_Ability.isCooldown == false)
         {
+            // First check is the ability is learned, if not break out
+            if (heroClass.Q_Ability.abilityLevel <= 0)
+            {
+                currentAbility = null;
+                systemScript.AlertObservers("Ability is not learned yet!");
+                return;
+            }
+
             // If enough mana before showing indictors // TODO - Quick Cast check
             if (heroClass.Q_Ability.abilityCost <= heroClass.heroMana)
             { // If ability isn't prepped already
@@ -418,6 +555,14 @@ public class NewAbilityTracker : MonoBehaviour
         // Prep or cancel ability indicators
         if (Input.GetKeyDown(W_Ability_Keycode) && heroClass.W_Ability.isCooldown == false)
         {
+            // First check is the ability is learned, if not break out
+            if (heroClass.W_Ability.abilityLevel <= 0)
+            {
+                currentAbility = null;
+                systemScript.AlertObservers("Ability is not learned yet!");
+                return;
+            }
+
             // If enough mana before showing indictors // TODO - Quick Cast check
             if (heroClass.W_Ability.abilityCost <= heroClass.heroMana)
             { // If ability isn't prepped already
@@ -515,6 +660,14 @@ public class NewAbilityTracker : MonoBehaviour
         // Prep or cancel ability indicators
         if (Input.GetKeyDown(E_Ability_Keycode) && heroClass.E_Ability.isCooldown == false)
         {
+            // First check is the ability is learned, if not break out
+            if (heroClass.E_Ability.abilityLevel <= 0)
+            {
+                currentAbility = null;
+                systemScript.AlertObservers("Ability is not learned yet!");
+                return;
+            }
+
             // If enough mana before showing indictors // TODO - Quick Cast check
             if (heroClass.E_Ability.abilityCost <= heroClass.heroMana)
             { // If ability isn't prepped already
@@ -625,6 +778,13 @@ public class NewAbilityTracker : MonoBehaviour
         // Prep or cancel ability indicators
         if (Input.GetKeyDown(R_Ability_Keycode) && heroClass.R_Ability.isCooldown == false)
         {
+            // First check is the ability is learned, if not break out
+            if (heroClass.R_Ability.abilityLevel <= 0) {
+                currentAbility = null;
+                systemScript.AlertObservers("Ability is not learned yet!");
+                return;
+            }
+
             // If enough mana before showing indictors // TODO - Quick Cast check
             if (heroClass.R_Ability.abilityCost <= heroClass.heroMana)
             {

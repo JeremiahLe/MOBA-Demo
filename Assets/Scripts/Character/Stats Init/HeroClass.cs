@@ -16,6 +16,9 @@ public class HeroClass : MonoBehaviour
 
     [Header("Hero Stats")]
     [DisplayWithoutEdit] public int heroLevel;
+    [DisplayWithoutEdit] public int heroExp;
+    [DisplayWithoutEdit] public int heroExpToNext;
+    [DisplayWithoutEdit] public int heroSkillPoints;
 
     [SerializeField] public float heroHealth;
     [DisplayWithoutEdit] public float heroMaxHealth;
@@ -84,6 +87,9 @@ public class HeroClass : MonoBehaviour
     HeroClass()
     {
         heroLevel = 1;
+        heroExp = 0;
+        heroExpToNext = 50;
+        heroSkillPoints = 1;
 
         heroHealth = 100f;
         heroMaxHealth = heroHealth;
@@ -210,6 +216,8 @@ public class HeroClass : MonoBehaviour
         /// 
 
         heroLevel = 1;
+        heroExp = 0;
+        heroExpToNext = 50;
         Load_HeroHUDSprite(HeroAssigner.Ekard);
 
         heroHealth = 450f;
@@ -258,6 +266,8 @@ public class HeroClass : MonoBehaviour
         Q_Ability.Range = Q_Range;
         Q_Ability.abilityKeyCode = Q_Ability_Hotkey;
 
+        Q_Ability.abilityMaxLevel = 5;
+
         Q_Ability.abilityRangeNum = 6.5f;
 
         Q_Ability.abilityDuration = 0f;
@@ -296,6 +306,8 @@ public class HeroClass : MonoBehaviour
         W_Ability.Range = W_Range;
         W_Ability.abilityKeyCode = W_Ability_Hotkey;
 
+        W_Ability.abilityMaxLevel = 5;
+
         W_Ability.abilityRangeNum = 4.7f;
 
         W_Ability.abilityDuration = 0f;
@@ -331,6 +343,8 @@ public class HeroClass : MonoBehaviour
         E_Ability.Range = E_Range;
         E_Ability.abilityKeyCode = E_Ability_Hotkey;
 
+        E_Ability.abilityMaxLevel = 5;
+
         E_Ability.abilityRangeNum = 1f;
 
         E_Ability.abilityDuration = 2.5f;
@@ -361,6 +375,8 @@ public class HeroClass : MonoBehaviour
         R_Ability.Indicator = R_Indicator;
         R_Ability.Range = R_Range;
         R_Ability.abilityKeyCode = R_Ability_Hotkey;
+
+        R_Ability.abilityMaxLevel = 3;
 
         R_Ability.abilityRangeNum = 9f;
 

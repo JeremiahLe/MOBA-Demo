@@ -32,11 +32,6 @@ public class HUD_HoverAbilityToolTip : MonoBehaviour, IPointerEnterHandler, IPoi
         abilityPerLevelText.text = "";
     }
 
-    public void Update()
-    {
-
-    }
-
     public void UpdateAbilityTooltip()
     {
         switch (abilityInit)

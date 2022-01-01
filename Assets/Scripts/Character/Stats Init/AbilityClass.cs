@@ -18,6 +18,7 @@ public class AbilityClass
     public string abilityName;
 
     public int abilityLevel;
+    public int abilityMaxLevel;
     public float abilityCost;
 
     public float abilityCooldown;
