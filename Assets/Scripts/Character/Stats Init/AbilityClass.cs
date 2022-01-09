@@ -36,7 +36,15 @@ public class AbilityClass
 
     public float abilityScaling;
 
+    public float[] abilityDamagePerLevel;
+    public float[] abilityCostPerLevel;
+    public float[] abilityCooldownPerLevel;
+
+    public float[] abilityBuffPercentagePerLevel;
+    public float[] abilityDurationPerLevel;
+
     public bool isCooldown;
+    public bool isUltimate;
 
     public Sprite Indicator;
     public Sprite Range;

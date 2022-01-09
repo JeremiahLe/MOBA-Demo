@@ -132,25 +132,42 @@ public class HeroCombat : MonoBehaviour
             //if (targetedEnemy == prevEnemyRef)
             //if (moveToEnemy)
 
+            // This is the damage formula
             float damageCalc = heroClassScript.heroAttackDmg - (targetedEnemy.GetComponent<EnemyStatsScript>().enemyDef * 0.1f);
             damageCalc = Mathf.Round(damageCalc);
 
+
+            // Damage calcs for maximum resistance
             if (damageCalc <= 1f)
             {
+                // Check if attack would leave the target dead, if so grant xp (make sure the target only grants xp once)
+                if (targetedEnemy.GetComponent<EnemyStatsScript>().enemyHealth - damageCalc <= 0f && targetedEnemy.GetComponent<EnemyStatsScript>().enemyHealth >= 0)
+                {
+                    heroClassScript.heroExp += targetedEnemy.GetComponent<EnemyStatsScript>().enemyExpValue;
+                }
+
                 damageCalc = 1f;
                 targetedEnemy.GetComponent<EnemyStatsScript>().enemyHealth -= damageCalc;
             }
             else
             {
+                // Check if attack would leave the target dead, if so grant xp (make sure the target only grants xp once)
+                if (targetedEnemy.GetComponent<EnemyStatsScript>().enemyHealth - damageCalc <= 0f && targetedEnemy.GetComponent<EnemyStatsScript>().enemyHealth >= 0)
+                {
+                    heroClassScript.heroExp += targetedEnemy.GetComponent<EnemyStatsScript>().enemyExpValue;
+                }
+
                 targetedEnemy.GetComponent<EnemyStatsScript>().enemyHealth -= damageCalc;
             }
 
+            // Showing damage number UI popup on screen
             GameObject go = Instantiate(DamageTextPopup_object, targetedEnemy.transform.position + new Vector3(Random.Range(-1f, 1f),
         Random.Range(0, 0), 0), Quaternion.identity);
             go.GetComponent<DamageText_UI>().damageNumber.text = "-" + damageCalc.ToString();
             go.GetComponent<EnemyHealthSlider>().typeOfObject = "UI";
         }
 
+        // Reset the basic attack corountine
         performMeleeAttack = true;
     }
 

@@ -220,7 +220,7 @@ public class ProjectileScript : MonoBehaviour
     {
         if (hitObject == false)
         {
-            float damageCalc = projDamage + (heroClass.heroAbilityDmg * projDamageScaling) - (enemyStats.enemyRes * 0.1f);
+            float damageCalc = projDamage + (heroClass.heroAbilityDmg * projDamageScaling) - (enemyStats.enemyRes * 0.15f);
             damageCalc = Mathf.Round(damageCalc);
 
             DamageTextPopup_object = Resources.Load<GameObject>("Prefabs/DamagePopup_UI");
@@ -231,11 +231,23 @@ public class ProjectileScript : MonoBehaviour
 
             if (damageCalc <= 1f)
             {
+                // Check if attack would leave the target dead, if so grant xp (make sure the target only grants xp once)
+                if (enemyStats.enemyHealth - damageCalc <= 0f && enemyStats.enemyHealth >= 0)
+                {
+                    heroClass.heroExp += enemyStats.enemyExpValue;
+                }
+
                 enemyStats.enemyHealth -= 1f;
                 //healthCallRef.CallHealthTrigger(targetedEnemy);
             }
             else
             {
+                // Check if attack would leave the target dead, if so grant xp (make sure the target only grants xp once)
+                if (enemyStats.enemyHealth - damageCalc <= 0f && enemyStats.enemyHealth >= 0)
+                {
+                    heroClass.heroExp += enemyStats.enemyExpValue;
+                }
+
                 enemyStats.enemyHealth -= damageCalc;
                 //healthCallRef.CallHealthTrigger(targetedEnemy);
             }

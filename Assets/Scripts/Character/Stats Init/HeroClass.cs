@@ -19,6 +19,7 @@ public class HeroClass : MonoBehaviour
     [DisplayWithoutEdit] public int heroExp;
     [DisplayWithoutEdit] public int heroExpToNext;
     [DisplayWithoutEdit] public int heroSkillPoints;
+    [DisplayWithoutEdit] public bool heroCanLevelUltimate;
 
     [SerializeField] public float heroHealth;
     [DisplayWithoutEdit] public float heroMaxHealth;
@@ -46,6 +47,16 @@ public class HeroClass : MonoBehaviour
     [DisplayWithoutEdit] public float heroManaRegen;
 
     [DisplayWithoutEdit] public float heroCooldownReduction;
+
+    [Header("Hero Stats Per Level")]
+    [DisplayWithoutEdit] public float heroMaxHealthPerLevel;
+    [DisplayWithoutEdit] public float heroMaxManaPerLevel;
+
+    [DisplayWithoutEdit] public float heroDefPerLevel;
+    [DisplayWithoutEdit] public float heroResPerLevel;
+
+    [DisplayWithoutEdit] public float heroAttackDmgPerLevel;
+    [DisplayWithoutEdit] public float heroAttackSpeedPerLevel;
 
     [Header("Q Ability")]
     public AbilityClass Q_Ability;
@@ -181,27 +192,146 @@ public class HeroClass : MonoBehaviour
 
     // Hero inits
 
-    public void GetUpdatedStats(AbilityClass _ability)
+    public void GetUpdatedStats_Ekard(AbilityClass _ability, bool levelingAbility)
     {
         if (_ability == Q_Ability)
-        {
+        {   
+            if (levelingAbility)
+            {
+                switch (Q_Ability.abilityLevel)
+                {
+                    case 1:
+                        Q_Ability.abilityBaseDamage = Q_Ability.abilityDamagePerLevel[0];
+                        Q_Ability.abilityCost = Q_Ability.abilityCostPerLevel[0];
+                        break;
+
+                    case 2:
+                        Q_Ability.abilityBaseDamage = Q_Ability.abilityDamagePerLevel[1];
+                        Q_Ability.abilityCost = Q_Ability.abilityCostPerLevel[1];
+                        break;
+
+                    case 3:
+                        Q_Ability.abilityBaseDamage = Q_Ability.abilityDamagePerLevel[2];
+                        Q_Ability.abilityCost = Q_Ability.abilityCostPerLevel[2];
+                        break;
+
+                    case 4:
+                        Q_Ability.abilityBaseDamage = Q_Ability.abilityDamagePerLevel[3];
+                        Q_Ability.abilityCost = Q_Ability.abilityCostPerLevel[3];
+                        break;
+
+                    case 5:
+                        Q_Ability.abilityBaseDamage = Q_Ability.abilityDamagePerLevel[4];
+                        Q_Ability.abilityCost = Q_Ability.abilityCostPerLevel[4];
+                        break;
+                }
+            }
+
             Q_Ability.abilityDescription = Q_Ability.abilityDescription = string.Format(
-                "{0} casts a medium range fireball in a line, dealing {1} (+{2}) ability damage to the first enemy hit.", HeroName, Q_Ability.abilityBaseDamage, heroAbilityDmg);
+                "{0} casts a medium range fireball in a line, dealing {1} (+{2}) ability damage to the first enemy hit.", HeroName, Q_Ability.abilityBaseDamage, heroAbilityDmg * Q_Ability.abilityScaling);
         }
         else if (_ability == W_Ability)
         {
+            if (levelingAbility)
+            {
+                switch (W_Ability.abilityLevel)
+                {
+                    case 1:
+                        W_Ability.abilityBaseDamage = W_Ability.abilityDamagePerLevel[0];
+                        W_Ability.abilityCost = W_Ability.abilityCostPerLevel[0];
+                        W_Ability.abilityCooldown = W_Ability.abilityCooldownPerLevel[0];
+                        break;
+
+                    case 2:
+                        W_Ability.abilityBaseDamage = W_Ability.abilityDamagePerLevel[1];
+                        W_Ability.abilityCost = W_Ability.abilityCostPerLevel[1];
+                        W_Ability.abilityCooldown = W_Ability.abilityCooldownPerLevel[1];
+                        break;
+
+                    case 3:
+                        W_Ability.abilityBaseDamage = W_Ability.abilityDamagePerLevel[2];
+                        W_Ability.abilityCost = W_Ability.abilityCostPerLevel[2];
+                        W_Ability.abilityCooldown = W_Ability.abilityCooldownPerLevel[2];
+                        break;
+
+                    case 4:
+                        W_Ability.abilityBaseDamage = W_Ability.abilityDamagePerLevel[3];
+                        W_Ability.abilityCost = W_Ability.abilityCostPerLevel[3];
+                        W_Ability.abilityCooldown = W_Ability.abilityCooldownPerLevel[3];
+                        break;
+
+                    case 5:
+                        W_Ability.abilityBaseDamage = W_Ability.abilityDamagePerLevel[4];
+                        W_Ability.abilityCost = W_Ability.abilityCostPerLevel[4];
+                        W_Ability.abilityCooldown = W_Ability.abilityCooldownPerLevel[4];
+                        break;
+                }
+            }
+
             W_Ability.abilityDescription = string.Format(
-                "{0} creates an explosion of light at a target location, dealing {1} (+{2}) AOE ability damage. Can be cast while moving.", HeroName, W_Ability.abilityBaseDamage, heroAbilityDmg);
+                "{0} creates an explosion of light at a target location, dealing {1} (+{2}) AOE ability damage. Can be cast while moving.", HeroName, W_Ability.abilityBaseDamage, heroAbilityDmg * W_Ability.abilityScaling);
         }
         else if (_ability == E_Ability)
         {
+            if (levelingAbility)
+            {
+                switch (E_Ability.abilityLevel)
+                {
+                    case 1:
+                        E_Ability.abilityBuffPercentage = E_Ability.abilityBuffPercentagePerLevel[0];
+                        E_Ability.abilityDuration = E_Ability.abilityDurationPerLevel[0];
+                        break;
+
+                    case 2:
+                        E_Ability.abilityBuffPercentage = E_Ability.abilityBuffPercentagePerLevel[1];
+                        E_Ability.abilityDuration = E_Ability.abilityDurationPerLevel[1];
+                        break;
+
+                    case 3:
+                        E_Ability.abilityBuffPercentage = E_Ability.abilityBuffPercentagePerLevel[2];
+                        E_Ability.abilityDuration = E_Ability.abilityDurationPerLevel[2];
+                        break;
+
+                    case 4:
+                        E_Ability.abilityBuffPercentage = E_Ability.abilityBuffPercentagePerLevel[3];
+                        E_Ability.abilityDuration = E_Ability.abilityDurationPerLevel[3];
+                        break;
+
+                    case 5:
+                        E_Ability.abilityBuffPercentage = E_Ability.abilityBuffPercentagePerLevel[4];
+                        E_Ability.abilityDuration = E_Ability.abilityDurationPerLevel[4];
+                        break;
+                }
+            }
+
             E_Ability.abilityDescription = string.Format(
                 "{0} makes haste, gaining a burst of ({1}%) movement speed and attack speed for ({2}) seconds. Acts as an auto-attack reset.", HeroName, E_Ability.abilityBuffPercentage * 100, E_Ability.abilityDuration);
         }
         else if (_ability == R_Ability)
         {
+            if (levelingAbility)
+            {
+                switch (R_Ability.abilityLevel)
+                {
+                    case 1:
+                        R_Ability.abilityBaseDamage = R_Ability.abilityDamagePerLevel[0];
+                        R_Ability.abilityCooldown = R_Ability.abilityCooldownPerLevel[0];
+                        break;
+
+                    case 2:
+                        R_Ability.abilityBaseDamage = R_Ability.abilityDamagePerLevel[1];
+                        R_Ability.abilityCooldown = R_Ability.abilityCooldownPerLevel[1];
+                        break;
+
+                    case 3:
+                        R_Ability.abilityBaseDamage = R_Ability.abilityDamagePerLevel[2];
+                        R_Ability.abilityCooldown = R_Ability.abilityCooldownPerLevel[2];
+                        break;
+                }
+            }
+
             R_Ability.abilityDescription = string.Format(
-                "{0} conjures a massive fire bomb at an enemy, dealing {1} (+{2}) ability damage. ", HeroName, R_Ability.abilityBaseDamage, heroAbilityDmg);
+                "{0} conjures a massive fire bomb at an enemy, dealing {1} (+{2}) ability damage. ", HeroName, R_Ability.abilityBaseDamage, heroAbilityDmg * R_Ability.abilityScaling);
         }
         else
         {
@@ -247,6 +377,16 @@ public class HeroClass : MonoBehaviour
 
         heroCooldownReduction = 0.0f;
 
+        // Per Level Scalings
+        heroMaxHealthPerLevel = 45f;
+        heroMaxManaPerLevel = 55f;
+
+        heroDefPerLevel = 1.5f;
+        heroResPerLevel = 1.0f;
+
+        heroAttackDmgPerLevel = 1.5f;
+        heroAttackSpeedPerLevel = .05f;
+
         ///
         /// Q Abililty Init
         ///
@@ -277,14 +417,25 @@ public class HeroClass : MonoBehaviour
         Q_Ability.abilityCastTime = 0f;
 
         Q_Ability.abilityBaseDamage = 60f;
-        Q_Ability.abilityScaling = 1;
+        Q_Ability.abilityScaling = 1f;
 
         Q_Ability.abilityCost = 15f;
-        Q_Ability.abilityDescription = string.Format("{0} casts a medium range fireball in a line, dealing {1} (+{2}) ability damage to the first enemy hit.", HeroName, Q_Ability.abilityBaseDamage, heroAbilityDmg);
+        Q_Ability.abilityDescription = string.Format("{0} casts a medium range fireball in a line, dealing {1} (+{2}) ability damage to the first enemy hit.", HeroName, Q_Ability.abilityBaseDamage, heroAbilityDmg * Q_Ability.abilityScaling);
         Q_Ability.abilityPerLevel = string.Format("Damage: 60 / 80 / 110 / 130 / 150\nCost: 15 / 20 / 25 / 30 / 30");
 
-        // may change this
-        //Q_Ability.abilitySprite = Resources.Load<Sprite>("ProjectilePrefabSprites/Fireball_Sprite");
+        Q_Ability.abilityDamagePerLevel = new float[5];
+        Q_Ability.abilityDamagePerLevel[0] = 60;
+        Q_Ability.abilityDamagePerLevel[1] = 80;
+        Q_Ability.abilityDamagePerLevel[2] = 110;
+        Q_Ability.abilityDamagePerLevel[3] = 130;
+        Q_Ability.abilityDamagePerLevel[4] = 150;
+
+        Q_Ability.abilityCostPerLevel = new float[5];
+        Q_Ability.abilityCostPerLevel[0] = 15;
+        Q_Ability.abilityCostPerLevel[1] = 20;
+        Q_Ability.abilityCostPerLevel[2] = 25;
+        Q_Ability.abilityCostPerLevel[3] = 30;
+        Q_Ability.abilityCostPerLevel[4] = 30;
 
         ///
         /// W Abililty Init
@@ -317,11 +468,32 @@ public class HeroClass : MonoBehaviour
         W_Ability.abilityCastTime = 0f;
 
         W_Ability.abilityBaseDamage = 90f;
-        Q_Ability.abilityScaling = .3f;
+        W_Ability.abilityScaling = .3f;
 
         W_Ability.abilityCost = 45f;
-        W_Ability.abilityDescription = string.Format("{0} creates an explosion of light at a target location, dealing {1} (+{2}) AOE ability damage. Can be cast while moving.", HeroName, W_Ability.abilityBaseDamage, heroAbilityDmg);
+        W_Ability.abilityDescription = string.Format("{0} creates an explosion of light at a target location, dealing {1} (+{2}) AOE ability damage. Can be cast while moving.", HeroName, W_Ability.abilityBaseDamage, heroAbilityDmg * W_Ability.abilityScaling);
         W_Ability.abilityPerLevel = string.Format("Damage: 90 / 110 / 130 / 140 / 150\nCost: 45 / 50 / 55 / 60 / 60\nCooldown: 9 / 8.75 / 8.25 / 7.75 / 6");
+
+        W_Ability.abilityDamagePerLevel = new float[5];
+        W_Ability.abilityDamagePerLevel[0] = 90;
+        W_Ability.abilityDamagePerLevel[1] = 110;
+        W_Ability.abilityDamagePerLevel[2] = 130;
+        W_Ability.abilityDamagePerLevel[3] = 140;
+        W_Ability.abilityDamagePerLevel[4] = 150;
+
+        W_Ability.abilityCostPerLevel = new float[5];
+        W_Ability.abilityCostPerLevel[0] = 45;
+        W_Ability.abilityCostPerLevel[1] = 50;
+        W_Ability.abilityCostPerLevel[2] = 55;
+        W_Ability.abilityCostPerLevel[3] = 60;
+        W_Ability.abilityCostPerLevel[4] = 60;
+
+        W_Ability.abilityCooldownPerLevel = new float[5];
+        W_Ability.abilityCooldownPerLevel[0] = 9;
+        W_Ability.abilityCooldownPerLevel[1] = 8.75f;
+        W_Ability.abilityCooldownPerLevel[2] = 8.25f;
+        W_Ability.abilityCooldownPerLevel[3] = 7.75f;
+        W_Ability.abilityCooldownPerLevel[4] = 6;
 
         ///
         /// E Abililty Init
@@ -347,7 +519,7 @@ public class HeroClass : MonoBehaviour
 
         E_Ability.abilityRangeNum = 1f;
 
-        E_Ability.abilityDuration = 2.5f;
+        E_Ability.abilityDuration = 2f;
         E_Ability.abilityBuffPercentage = .45f;
 
         E_Ability.abilityBaseDamage = 0f; // it doesn't do damage
@@ -355,6 +527,20 @@ public class HeroClass : MonoBehaviour
         E_Ability.abilityCost = 60f;
         E_Ability.abilityDescription = string.Format("{0} makes haste, gaining a burst of {1}% movement speed and attack speed for {2} seconds. Acts as an auto-attack reset.", HeroName, E_Ability.abilityBuffPercentage * 100, E_Ability.abilityDuration);
         E_Ability.abilityPerLevel = string.Format("Movement Speed & Attack Speed %: 45 / 50 / 55 / 60 / 60\nDuration: 2 / 2.2 / 2.6 / 2.8 / 3");
+
+        E_Ability.abilityBuffPercentagePerLevel = new float[5];
+        E_Ability.abilityBuffPercentagePerLevel[0] = .45f;
+        E_Ability.abilityBuffPercentagePerLevel[1] = .50f;
+        E_Ability.abilityBuffPercentagePerLevel[2] = .55f;
+        E_Ability.abilityBuffPercentagePerLevel[3] = .60f;
+        E_Ability.abilityBuffPercentagePerLevel[4] = .60f;
+
+        E_Ability.abilityDurationPerLevel = new float[5];
+        E_Ability.abilityDurationPerLevel[0] = 2;
+        E_Ability.abilityDurationPerLevel[1] = 2.2f;
+        E_Ability.abilityDurationPerLevel[2] = 2.6f;
+        E_Ability.abilityDurationPerLevel[3] = 2.8f;
+        E_Ability.abilityDurationPerLevel[4] = 3f;
 
         ///
         /// R Abililty Init
@@ -387,10 +573,35 @@ public class HeroClass : MonoBehaviour
         R_Ability.abilityCastTime = 0f;
 
         R_Ability.abilityBaseDamage = 150f;
-        Q_Ability.abilityScaling = .75f;
+        R_Ability.abilityScaling = .75f;
 
         R_Ability.abilityCost = 100f;
-        R_Ability.abilityDescription = string.Format("{0} conjures a massive fire bomb at an enemy, dealing {1} (+{2}) ability damage. ", HeroName, R_Ability.abilityBaseDamage, heroAbilityDmg);
+        R_Ability.abilityDescription = string.Format("{0} conjures a massive fire bomb at an enemy, dealing {1} (+{2}) ability damage. ", HeroName, R_Ability.abilityBaseDamage, heroAbilityDmg * R_Ability.abilityScaling);
         R_Ability.abilityPerLevel = string.Format("Damage: 150 / 195 / 245\nCooldown: 55 / 45 / 35");
+
+        R_Ability.abilityDamagePerLevel = new float[3];
+        R_Ability.abilityDamagePerLevel[0] = 150;
+        R_Ability.abilityDamagePerLevel[1] = 195;
+        R_Ability.abilityDamagePerLevel[2] = 245;
+
+        R_Ability.abilityCooldownPerLevel = new float[3];
+        R_Ability.abilityCooldownPerLevel[0] = 55;
+        R_Ability.abilityCooldownPerLevel[1] = 45;
+        R_Ability.abilityCooldownPerLevel[2] = 35;
+
+    }
+
+    private void OnApplicationQuit()
+    {
+        Q_Ability.abilityDamagePerLevel = null;
+        Q_Ability.abilityCostPerLevel = null;
+        Q_Ability.abilityCooldownPerLevel = null;
+
+        W_Ability.abilityDamagePerLevel = null;
+        W_Ability.abilityCostPerLevel = null;
+        W_Ability.abilityCooldownPerLevel = null;
+
+        E_Ability.abilityBuffPercentagePerLevel = null;
+        E_Ability.abilityDurationPerLevel = null;
     }
 }

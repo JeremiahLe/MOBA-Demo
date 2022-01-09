@@ -3055,7 +3055,8 @@ MonoBehaviour:
   enemyAttackSpeed: 1
   enemyAttackTime: 1.4
   enemyDef: 5
-  enemyRes: 1
+  enemyRes: 30
+  enemyExpValue: 25
   enemySpeed: 4
 --- !u!114 &303760051
 MonoBehaviour:
@@ -3314,7 +3315,8 @@ MonoBehaviour:
   enemyAttackSpeed: 1
   enemyAttackTime: 1.4
   enemyDef: 5
-  enemyRes: 1
+  enemyRes: 30
+  enemyExpValue: 25
   enemySpeed: 4
 --- !u!114 &330008882
 MonoBehaviour:
@@ -12848,7 +12850,7 @@ GameObject:
   - component: {fileID: 808617354}
   - component: {fileID: 808617353}
   m_Layer: 5
-  m_Name: Character_Health_Text
+  m_Name: Character_Exp_Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16128,7 +16130,7 @@ RectTransform:
   m_GameObject: {fileID: 1148611089}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -66.3}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.1841, y: 1.1841, z: 1.1841}
   m_Children:
   - {fileID: 195237831}
   - {fileID: 158278396}
@@ -16139,7 +16141,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 111.37423, y: 82.3}
+  m_AnchoredPosition: {x: 111.37423, y: 105}
   m_SizeDelta: {x: 493.556, y: 188.7039}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1148611091
@@ -16839,7 +16841,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1250382966}
   - component: {fileID: 1250382968}
-  - component: {fileID: 1250382967}
+  - component: {fileID: 1250382969}
   m_Layer: 5
   m_Name: HUD_ExpBar
   m_TagString: Untagged
@@ -16870,19 +16872,6 @@ RectTransform:
   m_AnchoredPosition: {x: -13, y: -525}
   m_SizeDelta: {x: 160, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1250382967
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1250382965}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8ae16a8350bc60149901df01f1ac9979, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerSlider3D: {fileID: 369850943}
 --- !u!114 &1250382968
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16934,6 +16923,20 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1250382969
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1250382965}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee153a9ad8589f843a733e666346eb9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerSlider3D: {fileID: 1250382968}
+  skillpointCheck_Script: {fileID: 2091413495}
 --- !u!1 &1258446880
 GameObject:
   m_ObjectHideFlags: 0
@@ -24318,7 +24321,11 @@ MonoBehaviour:
     abilityDescription: 
     abilityPerLevel: 
     abilityScaling: 0
+    abilityDamagePerLevel: 
+    abilityCostPerLevel: 
+    abilityCooldownPerLevel: 
     isCooldown: 0
+    isUltimate: 0
     Indicator: {fileID: 0}
     Range: {fileID: 0}
     HUDIcon: {fileID: 0}
@@ -24395,7 +24402,7 @@ MonoBehaviour:
   heroLevel: 0
   heroExp: 0
   heroExpToNext: 0
-  heroSkillPoints: 1
+  heroSkillPoints: 6
   heroHealth: 0
   heroMaxHealth: 100
   heroDef: 3
@@ -24414,6 +24421,12 @@ MonoBehaviour:
   heroHealthRegen: 1
   heroManaRegen: 2
   heroCooldownReduction: 0
+  heroMaxHealthPerLevel: 0
+  heroMaxManaPerLevel: 0
+  heroDefPerLevel: 0
+  heroResPerLevel: 0
+  heroAttackDmgPerLevel: 0
+  heroAttackSpeedPerLevel: 0
   Q_Ability:
     typeOfAbilityCast: 0
     typeOfAbilityCC: 0
@@ -24432,7 +24445,11 @@ MonoBehaviour:
     abilityDescription: 
     abilityPerLevel: 
     abilityScaling: 0
+    abilityDamagePerLevel: 
+    abilityCostPerLevel: 
+    abilityCooldownPerLevel: 
     isCooldown: 0
+    isUltimate: 0
     Indicator: {fileID: 0}
     Range: {fileID: 0}
     HUDIcon: {fileID: 0}
@@ -24458,7 +24475,11 @@ MonoBehaviour:
     abilityDescription: 
     abilityPerLevel: 
     abilityScaling: 0
+    abilityDamagePerLevel: 
+    abilityCostPerLevel: 
+    abilityCooldownPerLevel: 
     isCooldown: 0
+    isUltimate: 0
     Indicator: {fileID: 0}
     Range: {fileID: 0}
     HUDIcon: {fileID: 0}
@@ -24484,7 +24505,11 @@ MonoBehaviour:
     abilityDescription: 
     abilityPerLevel: 
     abilityScaling: 0
+    abilityDamagePerLevel: 
+    abilityCostPerLevel: 
+    abilityCooldownPerLevel: 
     isCooldown: 0
+    isUltimate: 0
     Indicator: {fileID: 0}
     Range: {fileID: 0}
     HUDIcon: {fileID: 0}
@@ -24510,7 +24535,11 @@ MonoBehaviour:
     abilityDescription: 
     abilityPerLevel: 
     abilityScaling: 0
+    abilityDamagePerLevel: 
+    abilityCostPerLevel: 
+    abilityCooldownPerLevel: 
     isCooldown: 0
+    isUltimate: 0
     Indicator: {fileID: 0}
     Range: {fileID: 0}
     HUDIcon: {fileID: 0}
@@ -24785,7 +24814,8 @@ MonoBehaviour:
   enemyAttackSpeed: 1
   enemyAttackTime: 1.4
   enemyDef: 5
-  enemyRes: 1
+  enemyRes: 30
+  enemyExpValue: 25
   enemySpeed: 4
 --- !u!114 &2043408369
 MonoBehaviour:

@@ -25,6 +25,8 @@ public class EnemyStatsScript : MonoBehaviour
     [SerializeField] public float enemyDef;
     [SerializeField] public float enemyRes;
 
+    [SerializeField] public int enemyExpValue;
+
     [DisplayWithoutEdit] public float enemySpeed;
 
     NavMeshAgent agent;

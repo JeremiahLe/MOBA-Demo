@@ -34,38 +34,47 @@ public class HUD_HoverAbilityToolTip : MonoBehaviour, IPointerEnterHandler, IPoi
 
     public void UpdateAbilityTooltip()
     {
-        switch (abilityInit)
+        switch (heroClass.HeroName)
         {
-            case "Q":
-                heroClass.GetUpdatedStats(heroClass.Q_Ability);
-                abilityNameText.text = heroClass.Q_Ability.abilityName;
-                abilityCostText.text = heroClass.Q_Ability.abilityCooldown.ToString() + " secs.\n" + heroClass.Q_Ability.abilityCost.ToString() + " Mana";
-                abilityDescriptionText.text = heroClass.Q_Ability.abilityDescription;
-                abilityPerLevelText.text = heroClass.Q_Ability.abilityPerLevel;
+            case "Ekard":
+                switch (abilityInit)
+                {
+                    case "Q":
+                        heroClass.GetUpdatedStats_Ekard(heroClass.Q_Ability, false);
+                        abilityNameText.text = heroClass.Q_Ability.abilityName;
+                        abilityCostText.text = heroClass.Q_Ability.abilityCooldown.ToString() + " secs.\n" + heroClass.Q_Ability.abilityCost.ToString() + " Mana";
+                        abilityDescriptionText.text = heroClass.Q_Ability.abilityDescription;
+                        abilityPerLevelText.text = heroClass.Q_Ability.abilityPerLevel;
+                        break;
+                    case "W":
+                        heroClass.GetUpdatedStats_Ekard(heroClass.W_Ability, false);
+                        abilityNameText.text = heroClass.W_Ability.abilityName;
+                        abilityCostText.text = heroClass.W_Ability.abilityCooldown.ToString() + " secs.\n" + heroClass.W_Ability.abilityCost.ToString() + " Mana";
+                        abilityDescriptionText.text = heroClass.W_Ability.abilityDescription;
+                        abilityPerLevelText.text = heroClass.W_Ability.abilityPerLevel;
+                        break;
+                    case "E":
+                        heroClass.GetUpdatedStats_Ekard(heroClass.E_Ability, false);
+                        abilityNameText.text = heroClass.E_Ability.abilityName;
+                        abilityCostText.text = heroClass.E_Ability.abilityCooldown.ToString() + " secs.\n" + heroClass.E_Ability.abilityCost.ToString() + " Mana";
+                        abilityDescriptionText.text = heroClass.E_Ability.abilityDescription;
+                        abilityPerLevelText.text = heroClass.E_Ability.abilityPerLevel;
+                        break;
+                    case "R":
+                        heroClass.GetUpdatedStats_Ekard(heroClass.R_Ability, false);
+                        abilityNameText.text = heroClass.R_Ability.abilityName;
+                        abilityCostText.text = heroClass.R_Ability.abilityCooldown.ToString() + " secs.\n" + heroClass.R_Ability.abilityCost.ToString() + " Mana";
+                        abilityDescriptionText.text = heroClass.R_Ability.abilityDescription;
+                        abilityPerLevelText.text = heroClass.R_Ability.abilityPerLevel;
+                        break;
+                    default:
+                        Debug.Log("Missing ability reference?");
+                        break;
+                }
                 break;
-            case "W":
-                heroClass.GetUpdatedStats(heroClass.W_Ability);
-                abilityNameText.text = heroClass.W_Ability.abilityName;
-                abilityCostText.text = heroClass.W_Ability.abilityCooldown.ToString() + " secs.\n" + heroClass.W_Ability.abilityCost.ToString() + " Mana";
-                abilityDescriptionText.text = heroClass.W_Ability.abilityDescription;
-                abilityPerLevelText.text = heroClass.W_Ability.abilityPerLevel;
-                break;
-            case "E":
-                heroClass.GetUpdatedStats(heroClass.E_Ability);
-                abilityNameText.text = heroClass.E_Ability.abilityName;
-                abilityCostText.text = heroClass.E_Ability.abilityCooldown.ToString() + " secs.\n" + heroClass.E_Ability.abilityCost.ToString() + " Mana";
-                abilityDescriptionText.text = heroClass.E_Ability.abilityDescription;
-                abilityPerLevelText.text = heroClass.E_Ability.abilityPerLevel;
-                break;
-            case "R":
-                heroClass.GetUpdatedStats(heroClass.R_Ability);
-                abilityNameText.text = heroClass.R_Ability.abilityName;
-                abilityCostText.text = heroClass.R_Ability.abilityCooldown.ToString() + " secs.\n" + heroClass.R_Ability.abilityCost.ToString() + " Mana";
-                abilityDescriptionText.text = heroClass.R_Ability.abilityDescription;
-                abilityPerLevelText.text = heroClass.R_Ability.abilityPerLevel;
-                break;
+
             default:
-                Debug.Log("Missing ability reference?");
+                Debug.Log("Missing hero reference?", this);
                 break;
         }
     }

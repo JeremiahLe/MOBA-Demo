@@ -61,7 +61,7 @@ public class TrackHeroInfo_HUDWindow : MonoBehaviour
         HeroHudName.text = hero.HeroName;
 
         HeroHudStats.text = string.Format(
-                    "Lvl {0}\n" +
+                    "Lvl {0} - Skillpoints: {11}\n" +
                     "    {1}              {2}\n" +
                     "    {3}              {4}\n" +
                     "    {5}%           {6}\n" +
@@ -72,7 +72,7 @@ public class TrackHeroInfo_HUDWindow : MonoBehaviour
                     , hero.heroDef, hero.heroRes
                     , hero.heroCritChance, hero.heroAttackSpeed
                     , hero.heroLifesteal, hero.heroTenacity
-                    , hero.heroCooldownReduction, hero.heroSpeed);
+                    , hero.heroCooldownReduction, hero.heroSpeed, hero.heroSkillPoints);
 
         #region Adding Icons & Sprites to Lists
         StatIconImages.Add(HeroAttackDamageIcon); // attack damage
@@ -160,7 +160,7 @@ public class TrackHeroInfo_HUDWindow : MonoBehaviour
             if (showHUDDetails)
             {
                 HeroHudStats.text = string.Format(
-                    "Lvl {0}\n" +
+                    "Lvl {0} - Skillpoints: {11}\n" +
                     "    {1}           {2}\n" +
                     "    {3}            {4}\n" +
                     "    {5}%         {6}\n" +
@@ -171,7 +171,7 @@ public class TrackHeroInfo_HUDWindow : MonoBehaviour
                     , hero.heroDef, hero.heroRes
                     , hero.heroCritChance, hero.heroAttackSpeed
                     , hero.heroLifesteal, hero.heroTenacity
-                    , hero.heroCooldownReduction, hero.heroSpeed);
+                    , hero.heroCooldownReduction, hero.heroSpeed, hero.heroSkillPoints);
             }
         }
     }

@@ -107,7 +107,8 @@ public class NewAbilityTracker : MonoBehaviour
     private CharacterMovementScript moveScript;
     HeroCombat heroCombat;
     AbilityLevelHUDVisualController_Script abilityHUDVisual;
-    public int availableSkillpoints = 1;
+    public int ultimateSkillpoints;
+    public bool canLevelUlt = false;
     #endregion
 
     void Start()
@@ -172,6 +173,7 @@ public class NewAbilityTracker : MonoBehaviour
         E_Ability();
         R_Ability();
 
+        //availableSkillpoints = heroClass.heroSkillPoints;
         CheckLearnAbility();
 
         // Made this for targeted ability casting once in range
@@ -258,7 +260,7 @@ public class NewAbilityTracker : MonoBehaviour
         _temp.GetComponent<ProjectileScript>().target = targetPos;
         _temp.GetComponent<ProjectileScript>().targetLoc = _abilityTargetDir;
         _temp.GetComponent<ProjectileScript>().projSpeed = _ability.abilitySpeed;
-        _temp.GetComponent<ProjectileScript>().projDamage = _ability.abilityBaseDamage + heroClass.heroAbilityDmg;
+        _temp.GetComponent<ProjectileScript>().projDamage = _ability.abilityBaseDamage + heroClass.heroAbilityDmg * _ability.abilityScaling;
         _temp.GetComponent<ProjectileScript>().projAbilityTypeString = _ability.typeOfAbilityCast.ToString();
         _temp.GetComponent<ProjectileScript>().projDamageType = ProjectileScript.ProjDamageType.Ability;
         _temp.GetComponent<ProjectileScript>().projCreator = gameObject;
@@ -318,27 +320,40 @@ public class NewAbilityTracker : MonoBehaviour
             // Q Ability
             if (Input.GetKeyUp(Q_Ability_Keycode))
             {
-                if (availableSkillpoints == 0)
+                // Check if hero has skill points to use
+                if (heroClass.heroSkillPoints == 0)
                 {
                     systemScript.AlertObservers("No available skill points!");
                     return;
                 }
 
-                if (availableSkillpoints != 0 && heroClass.Q_Ability.abilityLevel == heroClass.Q_Ability.abilityMaxLevel)
+                // Check if ability is already max level
+                if (heroClass.heroSkillPoints != 0 && heroClass.Q_Ability.abilityLevel == heroClass.Q_Ability.abilityMaxLevel)
                 {
                     systemScript.AlertObservers("Ability is max level!");
                     return;
                 }
 
+                // Unlock HUD Icon if not leveled
                 if (heroClass.Q_Ability.abilityLevel == 0)
                     heroClass.Q_Ability.HUDIcon.fillAmount = 0;
 
+                // Level up ability and reduce skill points
                 heroClass.Q_Ability.abilityLevel += 1;
-                int level = heroClass.Q_Ability.abilityLevel += 1;
-                availableSkillpoints -= 1;
+                heroClass.heroSkillPoints -= 1;
                 abilityHUDVisual.LevelAbilityHUD("Q", 1);
 
-                if (availableSkillpoints == 0)
+                // Upgrade ability stats
+                heroClass.GetUpdatedStats_Ekard(heroClass.Q_Ability, true);
+
+                // Check if ability is max level but skillpoints remain
+                if (heroClass.Q_Ability.abilityLevel == heroClass.Q_Ability.abilityMaxLevel)
+                {
+                    systemScript.AlertObservers("Available skill points but Q is maxed");
+                }
+
+                // Update HUD to show no more skillpoints
+                if (heroClass.heroSkillPoints == 0)
                 {
                     systemScript.AlertObservers("No available skill points! (No Popup)");
                     return;
@@ -347,27 +362,40 @@ public class NewAbilityTracker : MonoBehaviour
             else // W Ability
             if (Input.GetKeyUp(W_Ability_Keycode))
             {
-                if (availableSkillpoints == 0)
+                // Check if hero has skill points to use
+                if (heroClass.heroSkillPoints == 0)
                 {
                     systemScript.AlertObservers("No available skill points!");
                     return;
                 }
 
-                if (availableSkillpoints != 0 && heroClass.W_Ability.abilityLevel == heroClass.W_Ability.abilityMaxLevel)
+                // Check if ability is already max level
+                if (heroClass.heroSkillPoints != 0 && heroClass.W_Ability.abilityLevel == heroClass.W_Ability.abilityMaxLevel)
                 {
                     systemScript.AlertObservers("Ability is max level!");
                     return;
                 }
 
+                // Unlock HUD Icon if not leveled
                 if (heroClass.W_Ability.abilityLevel == 0)
                     heroClass.W_Ability.HUDIcon.fillAmount = 0;
 
+                // Level up ability and reduce skill points
                 heroClass.W_Ability.abilityLevel += 1;
-                int level = heroClass.W_Ability.abilityLevel += 1;
-                availableSkillpoints -= 1;
+                heroClass.heroSkillPoints -= 1;
                 abilityHUDVisual.LevelAbilityHUD("W", 1);
 
-                if (availableSkillpoints == 0)
+                // Upgrade ability stats
+                heroClass.GetUpdatedStats_Ekard(heroClass.W_Ability, true);
+
+                // Check if ability is max level but skillpoints remain
+                if (heroClass.W_Ability.abilityLevel == heroClass.W_Ability.abilityMaxLevel)
+                {
+                    systemScript.AlertObservers("Available skill points but W is maxed");
+                }
+
+                // Update HUD to show no more skillpoints
+                if (heroClass.heroSkillPoints == 0)
                 {
                     systemScript.AlertObservers("No available skill points! (No Popup)");
                     return;
@@ -376,27 +404,40 @@ public class NewAbilityTracker : MonoBehaviour
             else // E Ability
             if (Input.GetKeyUp(E_Ability_Keycode))
             {
-                if (availableSkillpoints == 0)
+                // Check if hero has skill points to use
+                if (heroClass.heroSkillPoints == 0)
                 {
                     systemScript.AlertObservers("No available skill points!");
                     return;
                 }
 
-                if (availableSkillpoints != 0 && heroClass.E_Ability.abilityLevel == heroClass.E_Ability.abilityMaxLevel)
+                // Check if ability is already max level
+                if (heroClass.heroSkillPoints != 0 && heroClass.E_Ability.abilityLevel == heroClass.E_Ability.abilityMaxLevel)
                 {
                     systemScript.AlertObservers("Ability is max level!");
                     return;
                 }
 
+                // Unlock HUD Icon if not leveled
                 if (heroClass.E_Ability.abilityLevel == 0)
                     heroClass.E_Ability.HUDIcon.fillAmount = 0;
 
+                // Level up ability and reduce skill points
                 heroClass.E_Ability.abilityLevel += 1;
-                int level = heroClass.E_Ability.abilityLevel += 1;
-                availableSkillpoints -= 1;
+                heroClass.heroSkillPoints -= 1;
                 abilityHUDVisual.LevelAbilityHUD("E", 1);
 
-                if (availableSkillpoints == 0)
+                // Upgrade ability stats
+                heroClass.GetUpdatedStats_Ekard(heroClass.E_Ability, true);
+
+                // Check if ability is max level but skillpoints remain
+                if (heroClass.E_Ability.abilityLevel == heroClass.E_Ability.abilityMaxLevel)
+                {
+                    systemScript.AlertObservers("Available skill points but E is maxed");
+                }
+
+                // Update HUD to show no more skillpoints
+                if (heroClass.heroSkillPoints == 0)
                 {
                     systemScript.AlertObservers("No available skill points! (No Popup)");
                     return;
@@ -405,28 +446,61 @@ public class NewAbilityTracker : MonoBehaviour
             else // R Ability
             if (Input.GetKeyUp(R_Ability_Keycode))
             {
-                if (availableSkillpoints == 0)
+                // Check if hero has skill points to use
+                if (heroClass.heroSkillPoints == 0)
                 {
                     systemScript.AlertObservers("No available skill points!");
                     return;
                 }
 
-                if (availableSkillpoints != 0 && heroClass.R_Ability.abilityLevel == heroClass.R_Ability.abilityMaxLevel)
+                // Check if ability is already max level
+                if (heroClass.heroSkillPoints != 0 && heroClass.R_Ability.abilityLevel == heroClass.R_Ability.abilityMaxLevel)
                 {
                     systemScript.AlertObservers("Ability is max level!");
                     return;
                 }
 
-                if (availableSkillpoints != 0 && heroClass.heroLevel >= 6 && heroClass.R_Ability.abilityLevel == 0) // TODO - SHOW AVAILABLE AT LEVEL 6 + POINT AND ONLY RANK 1 AT 6+, RANK 2 AT 11+ AND RANK 3 AT 16+
+                // Level up ability and reduce skill points AT LEVEL 6
+                if (heroClass.heroSkillPoints != 0 && heroClass.heroLevel >= 6 && heroClass.R_Ability.abilityLevel == 0 && heroClass.heroCanLevelUltimate) // TODO - SHOW AVAILABLE AT LEVEL 6 + POINT AND ONLY RANK 1 AT 6+, RANK 2 AT 11+ AND RANK 3 AT 16+
                 {
                     heroClass.R_Ability.abilityLevel += 1;
-                    int level = heroClass.R_Ability.abilityLevel += 1;
-                    availableSkillpoints -= 1;
+                    heroClass.heroSkillPoints -= 1;
+                    heroClass.heroCanLevelUltimate = false;
                     abilityHUDVisual.LevelAbilityHUD("R", 1);
                     heroClass.R_Ability.HUDIcon.fillAmount = 0;
                 }
 
-                if (availableSkillpoints == 0)
+                // Level up ability and reduce skill points AT LEVEL 11
+                if (heroClass.heroSkillPoints != 0 && heroClass.heroLevel >= 11 && heroClass.R_Ability.abilityLevel == 1 && heroClass.heroCanLevelUltimate) // TODO - SHOW AVAILABLE AT LEVEL 6 + POINT AND ONLY RANK 1 AT 6+, RANK 2 AT 11+ AND RANK 3 AT 16+
+                {
+                    heroClass.R_Ability.abilityLevel += 1;
+                    heroClass.heroSkillPoints -= 1;
+                    heroClass.heroCanLevelUltimate = false;
+                    abilityHUDVisual.LevelAbilityHUD("R", 1);
+                    heroClass.R_Ability.HUDIcon.fillAmount = 0;
+                }
+
+                // Level up ability and reduce skill points AT LEVEL 16
+                if (heroClass.heroSkillPoints != 0 && heroClass.heroLevel >= 16 && heroClass.R_Ability.abilityLevel == 2 && heroClass.heroCanLevelUltimate) // TODO - SHOW AVAILABLE AT LEVEL 6 + POINT AND ONLY RANK 1 AT 6+, RANK 2 AT 11+ AND RANK 3 AT 16+
+                {
+                    heroClass.R_Ability.abilityLevel += 1;
+                    heroClass.heroSkillPoints -= 1;
+                    heroClass.heroCanLevelUltimate = false;
+                    abilityHUDVisual.LevelAbilityHUD("R", 1);
+                    heroClass.R_Ability.HUDIcon.fillAmount = 0;
+                }
+
+                // Upgrade ability stats
+                heroClass.GetUpdatedStats_Ekard(heroClass.R_Ability, true);
+
+                // Check if ability is max level but skillpoints remain
+                if (heroClass.R_Ability.abilityLevel == heroClass.R_Ability.abilityMaxLevel)
+                {
+                    systemScript.AlertObservers("Available skill points but R is maxed");
+                }
+
+                // Update HUD to show no more skillpoints
+                if (heroClass.heroSkillPoints == 0)
                 {
                     systemScript.AlertObservers("No available skill points! (No Popup)");
                     return;
@@ -553,7 +627,7 @@ public class NewAbilityTracker : MonoBehaviour
     void W_Ability()
     {
         // Prep or cancel ability indicators
-        if (Input.GetKeyDown(W_Ability_Keycode) && heroClass.W_Ability.isCooldown == false)
+        if (Input.GetKeyDown(W_Ability_Keycode) && !Input.GetKey(KeyCode.LeftShift) && heroClass.W_Ability.isCooldown == false)
         {
             // First check is the ability is learned, if not break out
             if (heroClass.W_Ability.abilityLevel <= 0)
@@ -658,7 +732,7 @@ public class NewAbilityTracker : MonoBehaviour
     void E_Ability()
     {
         // Prep or cancel ability indicators
-        if (Input.GetKeyDown(E_Ability_Keycode) && heroClass.E_Ability.isCooldown == false)
+        if (Input.GetKeyDown(E_Ability_Keycode) && !Input.GetKey(KeyCode.LeftShift) && heroClass.E_Ability.isCooldown == false)
         {
             // First check is the ability is learned, if not break out
             if (heroClass.E_Ability.abilityLevel <= 0)
@@ -776,7 +850,7 @@ public class NewAbilityTracker : MonoBehaviour
     void R_Ability()
     {
         // Prep or cancel ability indicators
-        if (Input.GetKeyDown(R_Ability_Keycode) && heroClass.R_Ability.isCooldown == false)
+        if (Input.GetKeyDown(R_Ability_Keycode) && !Input.GetKey(KeyCode.LeftShift) && heroClass.R_Ability.isCooldown == false)
         {
             // First check is the ability is learned, if not break out
             if (heroClass.R_Ability.abilityLevel <= 0) {
