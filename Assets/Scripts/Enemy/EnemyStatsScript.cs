@@ -9,6 +9,7 @@ public class EnemyStatsScript : MonoBehaviour
     [Header("Enemy Stats")]
     [SerializeField] public string enemyName = "";
     [SerializeField] public Sprite enemyHUDIcon;
+    [SerializeField] public int enemyLevel;
 
     [SerializeField] public float enemyHealth;
     [DisplayWithoutEdit] public float enemyMaxHealth = 10;

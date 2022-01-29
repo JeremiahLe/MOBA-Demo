@@ -55,7 +55,7 @@ public class TrackEnemyInfo_HUDWindow : MonoBehaviour
         targetedEnemyRef = _targetedEnemyRef;
         enemyStats = targetedEnemyRef.GetComponent<EnemyStatsScript>();
 
-        EnemyHudName.text = enemyStats.enemyName;
+        EnemyHudName.text = enemyStats.enemyName + " Lvl " + enemyStats.enemyLevel;
         HUDWindow.sprite = HUDWindowSprite;
         EnemyHudIcon.sprite = enemyStats.enemyHUDIcon;
     }

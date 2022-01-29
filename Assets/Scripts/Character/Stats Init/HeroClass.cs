@@ -345,7 +345,7 @@ public class HeroClass : MonoBehaviour
         /// Hero - Ekard Stat Init
         /// 
 
-        heroLevel = 1;
+        heroLevel = 5;
         heroExp = 0;
         heroExpToNext = 50;
         Load_HeroHUDSprite(HeroAssigner.Ekard);
