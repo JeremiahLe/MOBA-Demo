@@ -19,17 +19,23 @@ public class HeroCombat : MonoBehaviour
     public GameObject enemyToAttack;
 
     // Combat range visuals
-    [SerializeField] private Image attackRange_Indicator;
+    [SerializeField] private Sprite attackRange_Indicator_Sprite;
+    [SerializeField] private Sprite NoVisual_Sprite;
     [SerializeField] private Canvas attackRange_Canvas;
     private float offset;
     [SerializeField] private KeyCode checkAttackRange;
     private float radius;
-    Image attackRange_Indicator_Image;
+    [SerializeField] private Image attackRange_Indicator_Image;
+
+    [Range(0.01f, 1.0f)]
+    [SerializeField] private float Range_ScaleFactor;
 
     // Character Animator
     private CharacterMovementScript moveScript;
     private HeroClass heroClassScript;
     public Animator anim;
+
+    AbilityClass Q_Ability;
 
     // Combat Variables
     public bool basicAtkIdle = false;
@@ -48,22 +54,18 @@ public class HeroCombat : MonoBehaviour
         heroClassScript = GetComponent<HeroClass>();
         anim = GetComponentInChildren<Animator>();
 
+        // Preload damage popup UI element
         DamageTextPopup_object = Resources.Load<GameObject>("Prefabs/DamagePopup_UI");
 
-        //attackRange_Indicator_Image = attackRange_Indicator.GetComponent<Image>();
-
-        // This is defunct code to scale the image of the attack range properly
-        radius = heroAttackRange / 2.0f / 2.0f / 2.0f / 1.25f;
+        // Scale Attack Range Indicator Image to Attack Range variable
+        attackRange_Indicator_Image.transform.localScale = new Vector3(heroAttackRange * Range_ScaleFactor, heroAttackRange * Range_ScaleFactor, heroAttackRange * Range_ScaleFactor);
     }
 
     // Update is called once per frame
     void Update()
     {
-        //CheckAttackRange();
-
+        CheckAttackRange();
         CheckCombat();
-
-        //attackRange_Indicator.transform.localScale = new Vector3(radius + offset, radius + offset, radius + offset);
     }
 
     void CheckCombat()
@@ -173,10 +175,13 @@ public class HeroCombat : MonoBehaviour
 
     void CheckAttackRange()
     {
-        if (Input.GetKeyDown(checkAttackRange) && attackRange_Indicator.GetComponent<Image>().enabled == false)
-            attackRange_Indicator_Image.enabled = true;
-        else if (Input.GetKeyDown(checkAttackRange) && attackRange_Indicator.GetComponent<Image>().enabled == true)
-            attackRange_Indicator_Image.enabled = false;
+        if (Input.GetKeyDown(checkAttackRange) && attackRange_Indicator_Image.sprite == NoVisual_Sprite)
+        {
+            attackRange_Indicator_Image.sprite = attackRange_Indicator_Sprite;
+            heroClassScript.GetUpdatedStats_Ekard(heroClassScript.Q_Ability, false);
+        }
+        else if (Input.GetKeyDown(checkAttackRange) && attackRange_Indicator_Image.sprite == attackRange_Indicator_Sprite)
+            attackRange_Indicator_Image.sprite = NoVisual_Sprite;
     }
 
     void CheckHealth()

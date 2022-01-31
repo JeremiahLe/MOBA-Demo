@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public class NewAbilityTracker : MonoBehaviour
+public class Ekard_AbilityTracker : MonoBehaviour
 {
     /// <summary>
     /// Hero Script for - Cube
@@ -100,6 +100,7 @@ public class NewAbilityTracker : MonoBehaviour
 
     public bool Ability_MoveInRangeCast = false;
     public float startHeroSpeed;
+    public float heroAbilityCDR;
     #endregion
 
     #region Component Initilization
@@ -244,6 +245,21 @@ public class NewAbilityTracker : MonoBehaviour
 
             case "Attack Speed":
             heroClass.heroAttackSpeed = StatDefaultValue;
+                break;
+
+        }
+    }
+
+    void UpdateStatValue(string StatName, float statAmount)
+    {
+        switch (StatName)
+        {
+            case "CDR":
+                heroClass.heroCooldownReduction += statAmount;
+                break;
+
+            default:
+                Debug.Log("Missing stat reference?", this);
                 break;
 
         }

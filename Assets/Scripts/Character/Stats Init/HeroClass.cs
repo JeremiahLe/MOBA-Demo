@@ -198,6 +198,10 @@ public class HeroClass : MonoBehaviour
         {   
             if (levelingAbility)
             {
+                // Update CDR TEMP
+                // Q_Ability.abilityCooldown = Q_Ability.abilityCooldown - (Q_Ability.abilityCooldown * (heroCooldownReduction / 100));
+                // Debug.Log($"{Q_Ability.abilityCooldown} - {Q_Ability.abilityCooldown} * {heroCooldownReduction}");
+
                 switch (Q_Ability.abilityLevel)
                 {
                     case 1:
@@ -226,6 +230,8 @@ public class HeroClass : MonoBehaviour
                         break;
                 }
             }
+
+            Debug.Log("Stats Updated!", this);
 
             Q_Ability.abilityDescription = Q_Ability.abilityDescription = string.Format(
                 "{0} casts a medium range fireball in a line, dealing {1} (+{2}) ability damage to the first enemy hit.", HeroName, Q_Ability.abilityBaseDamage, heroAbilityDmg * Q_Ability.abilityScaling);
