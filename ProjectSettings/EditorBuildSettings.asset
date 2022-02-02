@@ -5,7 +5,10 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Backup Test Scene.unity
     guid: 2f0d98809aaf76d408b16f9b99e037ac
+  - enabled: 1
+    path: Assets/Scenes/RoomBrowser.unity
+    guid: 3914db895f9e2e748900969fa817c24d
   m_configObjects: {}
